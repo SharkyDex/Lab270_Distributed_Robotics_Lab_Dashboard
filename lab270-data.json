@@ -89,40 +89,40 @@
   ],
   "projects": [
     {
-      "title": "SwarmNav: Decentralized navigation for robot swarms",
-      "description": "Developing distributed planning algorithms for 10+ robot teams operating in GPS-denied environments using only local sensor data.",
+      "title": "3D Truck Parking Detection - Foundational Models",
+      "description": "Developing end-to-end pipelines for 3D reconstruction of truck parking sites from monocular perspective images, Calibrating, Transforming, Registering, Fusing point clouds for spatial occupancy analysis",
       "members": [
-        "Carlos Reyes",
-        "Kwame Asante"
+        "Ammar Attaalla",
+        "Mohammed Jassim Jahubar Ali",
+        "Tarun Mudaliar"
       ],
       "status": "active",
       "photo": ""
     },
     {
-      "title": "TactileGrasp: Sim-to-real manipulation learning",
-      "description": "Training dexterous manipulation policies in simulation and transferring to physical robot arms using domain randomization.",
+      "title": "3D Reconstruction from Fish-Eye Imagery & Using AIF for Roadside Control",
+      "description": "Developing end-to-end pipeline for 3d reconstruction of scenes from fish-eye images and video clips, using only monocular vision for spatial prediction suing foundational models and using AIF to predict vehicle and pedestrian motion trajectories",
       "members": [
-        "Lena Fischer",
-        "Dr. Mart\u00ednez"
+        "Mohammed Jassim Jahubar Ali",
+        "Tarun Mudaliar"
       ],
       "status": "active",
       "photo": ""
     },
     {
-      "title": "SLAM++ for dynamic environments",
-      "description": "Extending SLAM algorithms to handle moving objects in indoor warehouse scenarios.",
+      "title": "AIF for Autonomous Vehicle Following ",
+      "description": "Using AIF for an autonomous vehicle following system, that accurately follows a lead vehicle under real world situations",
       "members": [
-        "Priya Nair"
+        "Aayush anand"
       ],
       "status": "active",
       "photo": ""
     },
     {
-      "title": "HRI Dashboard: Real-time robot monitoring UI",
-      "description": "Web-based monitoring for live robot fleet telemetry, in collaboration with the university hospital.",
+      "title": "Dashboard: Real-time System & Robot Monitoring UI",
+      "description": "Web-based monitoring for live robot fleet telemetry",
       "members": [
-        "Sofia Lombardi",
-        "Tai Nguyen"
+        "mMohammed Jassim Jahubar Ali"
       ],
       "status": "active",
       "photo": ""
