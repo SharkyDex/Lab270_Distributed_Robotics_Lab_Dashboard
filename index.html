@@ -1,65 +1,99 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lab 270 — Distributed Robotics Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
+
+/* ══ THEME TOKENS ══ */
+:root[data-theme="dark"]{
   --bg:#0d1117;--bg2:#161b22;--bg3:#1c2330;--bg4:#212936;
   --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.14);
   --txt:#e6edf3;--txt2:#8b949e;--txt3:#6e7681;
-  --accent:#2563eb;--accent-dim:#1d4ed844;
+  --accent:#2563eb;--accent-dim:#1d4ed844;--accent2:#3b82f6;
   --green:#22c55e;--green-bg:rgba(34,197,94,0.12);
   --amber:#f59e0b;--amber-bg:rgba(245,158,11,0.12);
   --red:#ef4444;--red-bg:rgba(239,68,68,0.12);
   --blue:#3b82f6;--blue-bg:rgba(59,130,246,0.12);
   --purple:#a78bfa;--purple-bg:rgba(167,139,250,0.12);
   --teal:#2dd4bf;--teal-bg:rgba(45,212,191,0.12);
-  --r:10px;--rs:6px;
-  font-family:'Segoe UI',system-ui,sans-serif;
+  --shadow:0 1px 3px rgba(0,0,0,0.4);
+  --shadow-md:0 4px 16px rgba(0,0,0,0.5);
+  --input-bg:#0d1117;
 }
-body{background:var(--bg);color:var(--txt);min-height:100vh;font-size:14px;line-height:1.5;overflow-x:hidden}
+:root[data-theme="light"]{
+  --bg:#f0f4f8;--bg2:#ffffff;--bg3:#e8edf3;--bg4:#dde4ed;
+  --border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.15);
+  --txt:#1a2332;--txt2:#4a5568;--txt3:#718096;
+  --accent:#1d4ed8;--accent-dim:#dbeafe;--accent2:#2563eb;
+  --green:#16a34a;--green-bg:rgba(22,163,74,0.1);
+  --amber:#d97706;--amber-bg:rgba(217,119,6,0.1);
+  --red:#dc2626;--red-bg:rgba(220,38,38,0.1);
+  --blue:#2563eb;--blue-bg:rgba(37,99,235,0.1);
+  --purple:#7c3aed;--purple-bg:rgba(124,58,237,0.1);
+  --teal:#0d9488;--teal-bg:rgba(13,148,136,0.1);
+  --shadow:0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md:0 4px 16px rgba(0,0,0,0.12);
+  --input-bg:#ffffff;
+}
+
+body{background:var(--bg);color:var(--txt);min-height:100vh;font-size:14px;line-height:1.5;overflow-x:hidden;
+  font-family:'IBM Plex Sans',system-ui,sans-serif;transition:background .25s,color .25s}
 
 /* ── HEADER ── */
-header{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;border-bottom:0.5px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:200}
-.lab-logo{width:38px;height:38px;background:var(--accent);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff}
-.lab-name{font-size:16px;font-weight:600;letter-spacing:-0.3px}
-.lab-sub{font-size:11px;color:var(--txt2);margin-top:1px}
-.hdr-right{display:flex;align-items:center;gap:16px}
-#clock{font-family:monospace;font-size:20px;font-weight:500;letter-spacing:2px}
-#dateline{font-size:11px;color:var(--txt2);text-align:right;margin-top:1px}
-.ctrl-group{display:flex;align-items:center;gap:8px}
-.cbtn{background:var(--bg3);border:0.5px solid var(--border2);color:var(--txt2);border-radius:var(--rs);padding:5px 11px;font-size:12px;cursor:pointer;transition:all .15s;white-space:nowrap}
-.cbtn:hover{color:var(--txt);border-color:var(--txt3)}
+header{display:flex;align-items:center;justify-content:space-between;padding:10px 22px;
+  border-bottom:1px solid var(--border);background:var(--bg2);position:sticky;top:0;z-index:200;
+  box-shadow:var(--shadow)}
+.lab-logo{width:36px;height:36px;background:var(--accent);border-radius:8px;display:flex;align-items:center;
+  justify-content:center;font-size:13px;font-weight:700;color:#fff;letter-spacing:-0.5px;flex-shrink:0}
+.lab-name{font-size:15px;font-weight:600;letter-spacing:-0.3px;color:var(--txt)}
+.lab-sub{font-size:11px;color:var(--txt3);margin-top:1px}
+.hdr-right{display:flex;align-items:center;gap:14px}
+#clock{font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:500;letter-spacing:2px;color:var(--txt)}
+#dateline{font-size:11px;color:var(--txt3);text-align:right;margin-top:1px}
+.ctrl-group{display:flex;align-items:center;gap:7px}
+.cbtn{background:var(--bg3);border:1px solid var(--border2);color:var(--txt2);border-radius:6px;
+  padding:5px 11px;font-size:12px;cursor:pointer;transition:all .15s;white-space:nowrap;
+  font-family:inherit}
+.cbtn:hover{color:var(--txt);border-color:var(--txt3);background:var(--bg4)}
 .cbtn.on{background:var(--accent);color:#fff;border-color:var(--accent)}
 .spd{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--txt3)}
-.spd input{width:70px;accent-color:var(--accent)}
+.spd input{width:65px;accent-color:var(--accent)}
+.theme-toggle{background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:5px 10px;
+  cursor:pointer;font-size:14px;transition:all .15s;line-height:1}
+.theme-toggle:hover{background:var(--bg4)}
 
 /* ── PROGRESS ── */
 #prog-wrap{height:2px;background:var(--bg3)}
-#prog-bar{height:2px;background:var(--accent);width:0%}
+#prog-bar{height:2px;background:var(--accent);width:0%;transition:none}
 
 /* ── NAV ── */
-nav{display:flex;gap:2px;padding:7px 24px;background:var(--bg);border-bottom:0.5px solid var(--border);overflow-x:auto;scrollbar-width:none}
+nav{display:flex;gap:2px;padding:6px 22px;background:var(--bg2);border-bottom:1px solid var(--border);
+  overflow-x:auto;scrollbar-width:none}
 nav::-webkit-scrollbar{display:none}
-.tab{padding:5px 12px;border-radius:var(--rs);font-size:12px;color:var(--txt2);cursor:pointer;white-space:nowrap;border:none;background:transparent;transition:background .15s,color .15s}
+.tab{padding:5px 12px;border-radius:6px;font-size:12px;color:var(--txt2);cursor:pointer;white-space:nowrap;
+  border:none;background:transparent;transition:background .15s,color .15s;font-family:inherit}
 .tab:hover{background:var(--bg3);color:var(--txt)}
 .tab.active{background:var(--accent);color:#fff}
 
 /* ── MAIN ── */
-main{padding:18px 24px}
+main{padding:18px 22px}
 .section{display:none}
 .section.active{display:block}
 
-/* ── GENERIC ── */
-.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
-.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
-.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px}
-.gauto{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:13px}
-.card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:15px 17px}
-.card-title{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.9px;color:var(--txt3);margin-bottom:11px}
+/* ── GRID LAYOUTS ── */
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.gauto{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:15px 17px;
+  box-shadow:var(--shadow)}
+.card-title{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.9px;
+  color:var(--txt3);margin-bottom:11px}
 .sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px}
 .sec-title{font-size:15px;font-weight:500}
 .sec-count{font-size:12px;color:var(--txt3)}
@@ -71,221 +105,314 @@ main{padding:18px 24px}
 .warn{background:var(--amber-bg);color:var(--amber)}.warn .bdot{background:var(--amber)}
 .err{background:var(--red-bg);color:var(--red)}.err .bdot{background:var(--red)}
 .info{background:var(--blue-bg);color:var(--blue)}.info .bdot{background:var(--blue)}
-.off{background:rgba(255,255,255,.05);color:var(--txt3)}.off .bdot{background:var(--txt3)}
+.off{background:var(--bg3);color:var(--txt3)}.off .bdot{background:var(--txt3)}
 
 /* ── STAT ROW ── */
 .stat-row{display:flex;gap:9px;margin-bottom:14px}
-.stat{flex:1;background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--rs);padding:11px 13px}
+.stat{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:11px 13px;
+  box-shadow:var(--shadow)}
 .stat-lbl{font-size:10px;color:var(--txt2);margin-bottom:2px;text-transform:uppercase;letter-spacing:.5px}
 .stat-val{font-size:24px;font-weight:500;letter-spacing:-.5px}
 
 /* ── AVATAR ── */
-.avatar{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;flex-shrink:0;overflow:hidden;background:var(--bg3)}
+.avatar{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:16px;font-weight:600;flex-shrink:0;overflow:hidden;background:var(--bg3)}
 .avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
-.ac0{background:#1e3a5f33;color:#3b82f6}.ac1{background:#1a3d2b33;color:#22c55e}
-.ac2{background:#3b1f6b33;color:#a78bfa}.ac3{background:#4a121233;color:#ef4444}
-.ac4{background:#3d2b0d33;color:#f59e0b}.ac5{background:#0d3d3d33;color:#2dd4bf}
-.ac6{background:#3d163333;color:#ec4899}.ac7{background:#1e2d3d33;color:#60a5fa}
+.ac0{background:#dbeafe;color:#1d4ed8}.ac1{background:#dcfce7;color:#15803d}
+.ac2{background:#ede9fe;color:#6d28d9}.ac3{background:#fee2e2;color:#b91c1c}
+.ac4{background:#fef3c7;color:#b45309}.ac5{background:#ccfbf1;color:#0f766e}
+.ac6{background:#fce7f3;color:#be185d}.ac7{background:#e0f2fe;color:#0369a1}
+[data-theme="dark"] .ac0{background:#1e3a5f33;color:#3b82f6}
+[data-theme="dark"] .ac1{background:#1a3d2b33;color:#22c55e}
+[data-theme="dark"] .ac2{background:#3b1f6b33;color:#a78bfa}
+[data-theme="dark"] .ac3{background:#4a121233;color:#ef4444}
+[data-theme="dark"] .ac4{background:#3d2b0d33;color:#f59e0b}
+[data-theme="dark"] .ac5{background:#0d3d3d33;color:#2dd4bf}
+[data-theme="dark"] .ac6{background:#3d163333;color:#ec4899}
+[data-theme="dark"] .ac7{background:#1e2d3d33;color:#60a5fa}
 
 /* ── PERSON CARD ── */
-.person-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:13px;display:flex;flex-direction:column;gap:7px}
+.person-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:13px;
+  display:flex;flex-direction:column;gap:7px;box-shadow:var(--shadow)}
 .ph{display:flex;align-items:center;gap:10px}
 .pname{font-size:13px;font-weight:500}
 .prole{font-size:11px;color:var(--txt2)}
 .ptags{display:flex;flex-wrap:wrap;gap:4px}
-.tag{font-size:11px;padding:2px 7px;border-radius:4px;background:var(--bg3);color:var(--txt2);border:0.5px solid var(--border)}
+.tag{font-size:11px;padding:2px 7px;border-radius:4px;background:var(--bg3);color:var(--txt2);
+  border:1px solid var(--border)}
 
 /* ── PI ── */
-.pi-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:20px;display:flex;gap:20px}
-.pi-photo{width:110px;height:110px;border-radius:10px;overflow:hidden;flex-shrink:0;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700}
+.pi-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:20px;
+  display:flex;gap:20px;box-shadow:var(--shadow)}
+.pi-photo{width:110px;height:110px;border-radius:10px;overflow:hidden;flex-shrink:0;background:var(--bg3);
+  display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700}
 .pi-photo img{width:100%;height:100%;object-fit:cover}
 .pi-name{font-size:19px;font-weight:600;margin-bottom:3px}
 .pi-title{font-size:12px;color:var(--txt2);margin-bottom:9px}
 .pi-bio{font-size:12px;color:var(--txt2);line-height:1.65;margin-bottom:9px}
 .pi-links{display:flex;gap:6px;flex-wrap:wrap}
-.pi-link{font-size:11px;padding:4px 10px;border-radius:var(--rs);border:0.5px solid var(--border2);color:var(--txt2);text-decoration:none;background:var(--bg3)}
+.pi-link{font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid var(--border2);color:var(--txt2);
+  text-decoration:none;background:var(--bg3)}
 
-/* ── STANDARD PROJECT CARD (grid view) ── */
-.proj-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column;cursor:pointer;transition:border-color .2s}
-.proj-card:hover{border-color:var(--border2)}
+/* ── PROJECT CARD (grid) ── */
+.proj-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;
+  display:flex;flex-direction:column;cursor:pointer;transition:border-color .2s,box-shadow .2s;
+  box-shadow:var(--shadow)}
+.proj-card:hover{border-color:var(--accent);box-shadow:var(--shadow-md)}
 .proj-accent{height:3px;background:var(--accent)}
 .proj-card.past .proj-accent{background:var(--txt3)}
 .proj-card.idea .proj-accent{background:var(--purple)}
 .proj-thumb{width:100%;height:120px;object-fit:cover;display:block;background:var(--bg3)}
-.proj-thumb-ph{width:100%;height:120px;background:var(--bg3);display:flex;align-items:center;justify-content:center;color:var(--txt3);font-size:26px}
+.proj-thumb-ph{width:100%;height:120px;background:var(--bg3);display:flex;align-items:center;
+  justify-content:center;color:var(--txt3);font-size:26px}
 .proj-body{padding:12px 14px;flex:1;display:flex;flex-direction:column;gap:5px}
 .proj-title{font-size:13px;font-weight:500}
 .proj-desc{font-size:12px;color:var(--txt2);line-height:1.5;flex:1}
 .proj-foot{display:flex;justify-content:space-between;align-items:center;margin-top:5px}
 .proj-members{font-size:11px;color:var(--txt3)}
-.proj-detail-btn{font-size:11px;color:var(--accent);border:none;background:none;cursor:pointer;padding:0}
 
 /* ══════════════════════════════════════════
    PROJECT DETAIL VIEWER
 ══════════════════════════════════════════ */
 #proj-viewer{
-  display:none;
-  position:fixed;inset:0;
-  background:var(--bg);
-  z-index:300;
-  flex-direction:column;
+  display:none;position:fixed;inset:0;
+  background:var(--bg);z-index:300;flex-direction:column;
 }
 #proj-viewer.open{display:flex}
 
-/* viewer header */
 .pv-header{
   display:flex;align-items:center;justify-content:space-between;
-  padding:12px 28px;
-  border-bottom:0.5px solid var(--border);
-  flex-shrink:0;
-  gap:16px;
+  padding:10px 26px;border-bottom:1px solid var(--border);
+  flex-shrink:0;gap:14px;background:var(--bg2);box-shadow:var(--shadow)
 }
 .pv-close{
-  background:var(--bg3);border:0.5px solid var(--border2);color:var(--txt2);
-  border-radius:var(--rs);padding:5px 13px;font-size:12px;cursor:pointer;
-  transition:all .15s;white-space:nowrap;
+  background:var(--bg3);border:1px solid var(--border2);color:var(--txt2);
+  border-radius:6px;padding:5px 13px;font-size:12px;cursor:pointer;
+  transition:all .15s;white-space:nowrap;font-family:inherit;
 }
-.pv-close:hover{color:var(--txt)}
+.pv-close:hover{color:var(--txt);background:var(--bg4)}
 .pv-nav-row{display:flex;align-items:center;gap:10px}
 .pv-navbtn{
-  background:var(--bg3);border:0.5px solid var(--border2);color:var(--txt2);
-  border-radius:var(--rs);padding:5px 14px;font-size:13px;cursor:pointer;
-  transition:all .15s;
+  background:var(--bg3);border:1px solid var(--border2);color:var(--txt2);
+  border-radius:6px;padding:5px 14px;font-size:13px;cursor:pointer;
+  transition:all .15s;font-family:inherit;
 }
 .pv-navbtn:hover{color:var(--txt);border-color:var(--txt3)}
 .pv-navbtn:disabled{opacity:.3;cursor:default}
 .pv-page-info{font-size:12px;color:var(--txt3);min-width:80px;text-align:center}
 .pv-dots{display:flex;gap:5px;align-items:center}
-.pv-dot{width:7px;height:7px;border-radius:50%;background:var(--bg3);border:0.5px solid var(--border2);cursor:pointer;transition:background .2s,transform .2s}
-.pv-dot.on{background:var(--accent);border-color:var(--accent);transform:scale(1.2)}
+.pv-dot{width:7px;height:7px;border-radius:50%;background:var(--bg3);border:1px solid var(--border2);
+  cursor:pointer;transition:background .2s,transform .2s}
+.pv-dot.on{background:var(--accent);border-color:var(--accent);transform:scale(1.25)}
 
-/* viewer progress */
+/* viewer edit toolbar */
+.pv-edit-bar{
+  display:none;align-items:center;gap:8px;padding:7px 26px;
+  background:var(--accent-dim);border-bottom:1px solid var(--border);
+  flex-shrink:0;flex-wrap:wrap;
+}
+.pv-edit-bar.show{display:flex}
+.pv-edit-bar-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--accent)}
+.add-page-btn{background:var(--accent);color:#fff;border:none;border-radius:6px;padding:4px 11px;
+  font-size:12px;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px}
+.add-page-btn:hover{opacity:.9}
+.page-type-select{background:var(--input-bg);border:1px solid var(--border2);color:var(--txt);
+  border-radius:6px;padding:4px 8px;font-size:12px;font-family:inherit;cursor:pointer}
+.del-page-btn{background:var(--red-bg);color:var(--red);border:1px solid var(--red-bg);
+  border-radius:6px;padding:4px 11px;font-size:12px;cursor:pointer;font-family:inherit}
+.del-page-btn:hover{background:var(--red);color:#fff}
+.edit-mode-badge{background:var(--accent);color:#fff;font-size:10px;font-weight:600;
+  padding:2px 8px;border-radius:20px;letter-spacing:.5px;text-transform:uppercase}
+
 #pv-prog-wrap{height:2px;background:var(--bg3);flex-shrink:0}
 #pv-prog-bar{height:2px;background:var(--accent);width:0%}
 
-/* viewer stage */
 .pv-stage{flex:1;overflow:hidden;position:relative}
 .pv-page{
-  position:absolute;inset:0;
-  overflow-y:auto;
-  opacity:0;pointer-events:none;
-  transition:opacity .35s;
+  position:absolute;inset:0;overflow-y:auto;
+  opacity:0;pointer-events:none;transition:opacity .3s;
   padding:32px 48px;
 }
 .pv-page.on{opacity:1;pointer-events:auto}
 
-/* ── PAGE TYPES ── */
-
-/* HERO page */
-.pv-hero{
-  display:flex;flex-direction:column;justify-content:center;
-  min-height:100%;gap:20px;
-  max-width:900px;margin:0 auto;
-}
+/* ── PAGE: HERO ── */
+.pv-hero{display:flex;flex-direction:column;justify-content:center;min-height:100%;gap:20px;
+  max-width:900px;margin:0 auto}
 .pv-hero-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--txt3)}
-.pv-hero-title{font-size:42px;font-weight:700;letter-spacing:-1px;line-height:1.15;color:var(--txt)}
-.pv-hero-img{
-  width:100%;max-height:300px;object-fit:cover;
-  border-radius:var(--r);border:0.5px solid var(--border);
-  margin:4px 0;
-}
+.pv-hero-title{font-size:40px;font-weight:700;letter-spacing:-1px;line-height:1.15;color:var(--txt)}
+.pv-hero-img{width:100%;max-height:300px;object-fit:cover;border-radius:10px;border:1px solid var(--border);margin:4px 0}
 .pv-hero-abstract{font-size:15px;color:var(--txt2);line-height:1.75;max-width:740px}
 .pv-hero-meta{display:flex;gap:24px;flex-wrap:wrap;align-items:center;margin-top:4px}
 .pv-hero-team{display:flex;gap:8px;flex-wrap:wrap}
-.pv-hero-member{
-  display:flex;align-items:center;gap:7px;
-  background:var(--bg2);border:0.5px solid var(--border);
-  border-radius:20px;padding:4px 12px 4px 4px;
-  font-size:12px;
-}
-.pv-mini-av{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;overflow:hidden;flex-shrink:0}
+.pv-hero-member{display:flex;align-items:center;gap:7px;background:var(--bg2);border:1px solid var(--border);
+  border-radius:20px;padding:4px 12px 4px 4px;font-size:12px}
+.pv-mini-av{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:9px;font-weight:600;overflow:hidden;flex-shrink:0}
 .pv-mini-av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
 
-/* PHOTO page */
+/* editable fields */
+.editable-field{display:inline-block;cursor:text;border-radius:4px;transition:background .15s;
+  min-width:40px;padding:2px 4px;margin:-2px -4px}
+.editable-field:focus{outline:2px solid var(--accent);background:var(--bg3)}
+[data-edit-mode] .editable-field{background:var(--bg3);outline:1px dashed var(--border2)}
+[data-edit-mode] .editable-field:hover{background:var(--bg4)}
+
+/* ── PAGE: PHOTOS ── */
 .pv-photo-page{display:flex;flex-direction:column;gap:16px;max-width:1000px;margin:0 auto;width:100%}
 .pv-photo-page h2{font-size:22px;font-weight:600;letter-spacing:-.3px}
 .pv-photo-grid{display:grid;gap:10px}
 .pv-photo-grid.cols1{grid-template-columns:1fr}
 .pv-photo-grid.cols2{grid-template-columns:1fr 1fr}
 .pv-photo-grid.cols3{grid-template-columns:1fr 1fr 1fr}
-.pv-photo-item{display:flex;flex-direction:column;gap:6px}
-.pv-photo-item img{width:100%;border-radius:var(--r);border:0.5px solid var(--border);object-fit:cover;max-height:340px}
-.pv-photo-item video{width:100%;border-radius:var(--r);border:0.5px solid var(--border);max-height:340px}
+.pv-photo-item{display:flex;flex-direction:column;gap:6px;position:relative}
+.pv-photo-item img{width:100%;border-radius:10px;border:1px solid var(--border);object-fit:cover;max-height:340px}
+.pv-photo-item video{width:100%;border-radius:10px;border:1px solid var(--border);max-height:340px}
 .pv-photo-cap{font-size:12px;color:var(--txt2);text-align:center}
+.photo-placeholder{width:100%;height:200px;border-radius:10px;border:1px dashed var(--border2);
+  display:flex;align-items:center;justify-content:center;color:var(--txt3);font-size:13px;
+  background:var(--bg3)}
 
-/* VIDEO page */
+/* ── PAGE: VIDEO ── */
 .pv-video-page{display:flex;flex-direction:column;gap:16px;max-width:900px;margin:0 auto;width:100%}
 .pv-video-page h2{font-size:22px;font-weight:600;letter-spacing:-.3px}
-.pv-video-wrap{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:var(--r);border:0.5px solid var(--border)}
+.pv-video-wrap{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;
+  border-radius:10px;border:1px solid var(--border)}
 .pv-video-wrap iframe,.pv-video-wrap video{position:absolute;inset:0;width:100%;height:100%}
+.video-placeholder{width:100%;height:260px;border-radius:10px;border:1px dashed var(--border2);
+  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;
+  color:var(--txt3);background:var(--bg3)}
 
-/* FINDINGS / INFERENCES page */
+/* ── PAGE: FINDINGS ── */
 .pv-findings-page{display:flex;flex-direction:column;gap:18px;max-width:900px;margin:0 auto;width:100%}
 .pv-findings-page h2{font-size:22px;font-weight:600;letter-spacing:-.3px}
-.pv-finding-card{
-  background:var(--bg2);border:0.5px solid var(--border);
-  border-radius:var(--r);padding:16px 18px;
-  display:flex;gap:14px;align-items:flex-start;
-}
-.pv-finding-icon{
-  width:36px;height:36px;border-radius:8px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:18px;flex-shrink:0;margin-top:1px;
-}
+.pv-finding-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;
+  padding:16px 18px;display:flex;gap:14px;align-items:flex-start;box-shadow:var(--shadow)}
+.pv-finding-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;
+  justify-content:center;font-size:18px;flex-shrink:0;margin-top:1px}
 .pv-finding-title{font-size:14px;font-weight:500;margin-bottom:4px}
 .pv-finding-body{font-size:13px;color:var(--txt2);line-height:1.6}
 .fi-finding .pv-finding-icon{background:var(--blue-bg)}
 .fi-inference .pv-finding-icon{background:var(--purple-bg)}
 .fi-result .pv-finding-icon{background:var(--green-bg)}
 .fi-warning .pv-finding-icon{background:var(--amber-bg)}
+.add-item-btn{background:var(--bg3);border:1px dashed var(--border2);color:var(--txt3);
+  border-radius:8px;padding:10px;font-size:12px;cursor:pointer;font-family:inherit;
+  width:100%;text-align:center;transition:all .15s}
+.add-item-btn:hover{color:var(--txt);border-color:var(--txt2)}
+.item-del-btn{position:absolute;top:8px;right:8px;background:var(--red-bg);color:var(--red);
+  border:none;border-radius:4px;padding:2px 7px;font-size:11px;cursor:pointer;font-family:inherit;
+  display:none}
+[data-edit-mode] .item-del-btn{display:block}
+.finding-wrap{position:relative}
 
-/* TEXT page */
+/* ── PAGE: TEXT ── */
 .pv-text-page{display:flex;flex-direction:column;gap:14px;max-width:820px;margin:0 auto;width:100%}
 .pv-text-page h2{font-size:22px;font-weight:600;letter-spacing:-.3px}
 .pv-text-body{font-size:14px;color:var(--txt2);line-height:1.8}
 
-/* MIXED page */
+/* ── PAGE: CONFERENCE ── */
+.pv-conf-page{display:flex;flex-direction:column;gap:18px;max-width:900px;margin:0 auto;width:100%}
+.pv-conf-page h2{font-size:22px;font-weight:600;letter-spacing:-.3px}
+.conf-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px 18px;
+  box-shadow:var(--shadow);position:relative}
+.conf-name{font-size:15px;font-weight:600;margin-bottom:2px}
+.conf-venue{font-size:12px;color:var(--txt3);margin-bottom:8px}
+.conf-desc{font-size:13px;color:var(--txt2);line-height:1.6}
+.conf-meta{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
+.conf-chip{font-size:11px;padding:2px 9px;border-radius:4px;background:var(--bg3);
+  color:var(--txt2);border:1px solid var(--border)}
+
+/* ── PAGE: DISCUSSION ── */
+.pv-discuss-page{display:flex;flex-direction:column;gap:16px;max-width:820px;margin:0 auto;width:100%}
+.pv-discuss-page h2{font-size:22px;font-weight:600;letter-spacing:-.3px}
+.discuss-thread{background:var(--bg2);border:1px solid var(--border);border-radius:10px;
+  overflow:hidden;box-shadow:var(--shadow)}
+.discuss-msg{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;gap:12px;
+  position:relative}
+.discuss-msg:last-child{border-bottom:none}
+.discuss-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
+.discuss-meta{font-size:12px;color:var(--txt3);margin-bottom:3px}
+.discuss-meta strong{color:var(--txt);font-weight:500}
+.discuss-body{font-size:13px;color:var(--txt2);line-height:1.6}
+
+/* ── PAGE: MIXED ── */
 .pv-mixed-page{display:flex;flex-direction:column;gap:18px;max-width:1000px;margin:0 auto;width:100%}
 .pv-mixed-page h2{font-size:22px;font-weight:600;letter-spacing:-.3px}
 .pv-mixed-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
 
 /* ── OTHER SECTIONS ── */
-.pub-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:13px 15px}
+.pub-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:13px 15px;
+  box-shadow:var(--shadow)}
 .pub-title{font-size:13px;font-weight:500;margin-bottom:3px}
 .pub-authors{font-size:11px;color:var(--txt3);margin-bottom:5px}
 .pub-venue{font-size:11px;color:var(--txt2)}
-.device-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:12px 14px;display:flex;justify-content:space-between;align-items:center}
+.device-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;
+  display:flex;justify-content:space-between;align-items:center;box-shadow:var(--shadow)}
 .dname{font-size:13px;font-weight:500}.dspec{font-size:11px;color:var(--txt3);margin-top:2px}
-.robot-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:13px}
+.robot-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:13px;
+  box-shadow:var(--shadow)}
 .rname{font-size:13px;font-weight:500;margin-bottom:1px}.rtype{font-size:11px;color:var(--txt3);margin-bottom:7px}
 .bar-bg{width:100%;height:4px;background:var(--bg3);border-radius:2px;margin-top:2px}
 .bar-fill{height:100%;border-radius:2px;background:var(--accent)}
 .bar-fill.g{background:var(--green)}.bar-fill.a{background:var(--amber)}.bar-fill.r{background:var(--red)}
 .rlbl{display:flex;justify-content:space-between;font-size:11px;color:var(--txt2);margin-top:4px}
-.announce-card{background:var(--bg2);border:0.5px solid var(--border);border-left:3px solid var(--teal);border-radius:var(--r);padding:12px 14px;margin-bottom:8px}
+.announce-card{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--teal);
+  border-radius:10px;padding:12px 14px;margin-bottom:8px;box-shadow:var(--shadow)}
 .ann-title{font-size:13px;font-weight:500;margin-bottom:3px}
 .ann-body{font-size:12px;color:var(--txt2);line-height:1.55}
 .ann-date{font-size:11px;color:var(--txt3);margin-top:4px}
-.news-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:12px 14px}
+.news-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;
+  box-shadow:var(--shadow)}
 .nsrc{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
 .ntitle{font-size:13px;font-weight:500;margin-bottom:3px;line-height:1.4}
 .ntime{font-size:11px;color:var(--txt3)}
-.event-row{display:flex;gap:13px;padding:10px 0;border-bottom:0.5px solid var(--border);align-items:flex-start}
+.event-row{display:flex;gap:13px;padding:10px 0;border-bottom:1px solid var(--border);align-items:flex-start}
 .event-row:last-child{border-bottom:none}
-.event-date{min-width:48px;text-align:center;background:var(--bg3);border-radius:var(--rs);padding:5px 3px;border:0.5px solid var(--border)}
+.event-date{min-width:48px;text-align:center;background:var(--bg3);border-radius:6px;padding:5px 3px;
+  border:1px solid var(--border)}
 .emonth{font-size:10px;color:var(--txt2);text-transform:uppercase;letter-spacing:.4px}
 .eday{font-size:20px;font-weight:500;line-height:1.1}
 .etitle{font-size:13px;font-weight:500;margin-bottom:2px}
 .edesc{font-size:12px;color:var(--txt2)}
 .overview-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-bottom:15px}
-.ov-stat{background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--rs);padding:12px;text-align:center}
+.ov-stat{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px;
+  text-align:center;box-shadow:var(--shadow)}
 .ov-num{font-size:28px;font-weight:600;letter-spacing:-1px}
 .ov-lbl{font-size:11px;color:var(--txt2);margin-top:1px}
+
+/* auto-refresh indicator */
+.refresh-dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;
+  margin-right:3px;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.refresh-lbl{font-size:11px;color:var(--txt3);display:flex;align-items:center;gap:3px}
+
+/* modal overlay */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;
+  align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal-box{background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:24px;
+  max-width:500px;width:90%;box-shadow:var(--shadow-md)}
+.modal-title{font-size:15px;font-weight:600;margin-bottom:16px}
+.modal-field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.modal-field label{font-size:12px;color:var(--txt2);font-weight:500}
+.modal-field input,.modal-field textarea,.modal-field select{
+  background:var(--input-bg);border:1px solid var(--border2);color:var(--txt);
+  border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;width:100%}
+.modal-field textarea{min-height:80px;resize:vertical}
+.modal-field input:focus,.modal-field textarea:focus,.modal-field select:focus{
+  outline:2px solid var(--accent);outline-offset:-1px}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.modal-btn{padding:7px 16px;border-radius:6px;font-size:13px;cursor:pointer;font-family:inherit;border:none}
+.modal-btn.primary{background:var(--accent);color:#fff}
+.modal-btn.primary:hover{opacity:.9}
+.modal-btn.cancel{background:var(--bg3);color:var(--txt2);border:1px solid var(--border2)}
+.modal-btn.cancel:hover{background:var(--bg4)}
 </style>
 </head>
 <body>
 
-<!-- PROJECT DETAIL VIEWER (fullscreen overlay) -->
+<!-- PROJECT DETAIL VIEWER -->
 <div id="proj-viewer">
   <div class="pv-header">
     <button class="pv-close" onclick="closeProjViewer()">← Back to dashboard</button>
@@ -297,17 +424,46 @@ main{padding:18px 24px}
       </div>
       <button class="pv-navbtn" id="pv-next" onclick="pvNav(1)">→</button>
     </div>
-    <div style="display:flex;align-items:center;gap:10px">
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <button class="cbtn" id="pv-edit-btn" onclick="pvToggleEdit()">✏️ Edit pages</button>
       <button class="cbtn" id="pv-play-btn" onclick="pvToggleCycle()">⏸ Pause</button>
       <div class="spd">
-        <span>Page speed</span>
+        <span>Speed</span>
         <input type="range" min="4" max="20" value="8" step="1" id="pv-speed" oninput="pvSetSpeed(this.value)">
         <span id="pv-speed-lbl">8s</span>
       </div>
     </div>
   </div>
+  <!-- Edit toolbar (shown in edit mode) -->
+  <div class="pv-edit-bar" id="pv-edit-bar">
+    <span class="edit-mode-badge">Edit mode</span>
+    <span class="pv-edit-bar-label">Add page:</span>
+    <select class="page-type-select" id="new-page-type">
+      <option value="text">📝 Text</option>
+      <option value="photos">🖼 Photos / Video</option>
+      <option value="findings">🔍 Findings</option>
+      <option value="video">▶️ Video embed</option>
+      <option value="conference">🏛 Conference</option>
+      <option value="discussion">💬 Discussion</option>
+    </select>
+    <button class="add-page-btn" onclick="pvAddPage()">+ Add page</button>
+    <span style="flex:1"></span>
+    <button class="del-page-btn" id="del-cur-page-btn" onclick="pvDeleteCurrentPage()">🗑 Delete this page</button>
+  </div>
   <div id="pv-prog-wrap"><div id="pv-prog-bar"></div></div>
   <div class="pv-stage" id="pv-stage"></div>
+</div>
+
+<!-- ADD ITEM MODAL -->
+<div class="modal-overlay" id="add-item-modal">
+  <div class="modal-box">
+    <div class="modal-title" id="modal-title">Add item</div>
+    <div id="modal-body"></div>
+    <div class="modal-btns">
+      <button class="modal-btn cancel" onclick="closeModal()">Cancel</button>
+      <button class="modal-btn primary" onclick="modalConfirm()">Add</button>
+    </div>
+  </div>
 </div>
 
 <header>
@@ -319,6 +475,8 @@ main{padding:18px 24px}
     </div>
   </div>
   <div class="hdr-right">
+    <div class="refresh-lbl"><span class="refresh-dot"></span><span id="refresh-status">Live</span></div>
+    <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()" title="Toggle light/dark theme">☀️</button>
     <div class="ctrl-group">
       <button class="cbtn on" id="btn-play" onclick="toggleCycle()">⏸ Pause</button>
       <button class="cbtn" onclick="prevTab()">←</button>
@@ -346,59 +504,48 @@ main{padding:18px 24px}
       <div><div class="sec-hdr"><div class="sec-title">Announcements</div></div><div id="ov-ann"></div></div>
     </div>
   </div>
-
   <div class="section" id="sec-pi">
     <div class="sec-hdr"><div class="sec-title">Principal investigator</div></div>
     <div id="pi-content"></div>
   </div>
-
   <div class="section" id="sec-students">
     <div class="sec-hdr"><div class="sec-title">Lab members</div><div class="sec-count" id="student-count"></div></div>
     <div class="gauto" id="students-grid"></div>
   </div>
-
   <div class="section" id="sec-projects">
     <div class="sec-hdr"><div class="sec-title">Active projects</div><div class="sec-count" style="font-size:11px;color:var(--txt3)">Click a project to view details</div></div>
     <div class="grid3" id="projects-grid"></div>
   </div>
-
   <div class="section" id="sec-past">
     <div class="sec-hdr"><div class="sec-title">Past projects</div><div class="sec-count" style="font-size:11px;color:var(--txt3)">Click a project to view details</div></div>
     <div class="grid3" id="past-grid"></div>
   </div>
-
   <div class="section" id="sec-ideas">
     <div class="sec-hdr"><div class="sec-title">New ideas &amp; proposals</div></div>
     <div class="gauto" id="ideas-grid"></div>
   </div>
-
   <div class="section" id="sec-robots">
     <div class="sec-hdr"><div class="sec-title">Robot fleet status</div></div>
     <div class="stat-row" id="robot-stats"></div>
     <div class="grid3" id="robots-grid"></div>
   </div>
-
   <div class="section" id="sec-computers">
     <div class="sec-hdr"><div class="sec-title">Workstation &amp; computer status</div></div>
     <div class="stat-row" id="computer-stats"></div>
     <div style="display:flex;flex-direction:column;gap:7px" id="computers-list"></div>
   </div>
-
   <div class="section" id="sec-publications">
     <div class="sec-hdr"><div class="sec-title">Publications &amp; portfolio</div></div>
     <div class="grid2" id="pubs-grid"></div>
   </div>
-
   <div class="section" id="sec-events">
     <div class="sec-hdr"><div class="sec-title">Events &amp; deadlines</div></div>
     <div class="grid2"><div id="events-list"></div><div id="deadlines-list"></div></div>
   </div>
-
   <div class="section" id="sec-announce">
     <div class="sec-hdr"><div class="sec-title">Lab announcements</div></div>
     <div id="announce-list"></div>
   </div>
-
   <div class="section" id="sec-news">
     <div class="sec-hdr"><div class="sec-title">News feed</div></div>
     <div class="grid3" id="news-grid"></div>
@@ -406,6 +553,26 @@ main{padding:18px 24px}
 </main>
 
 <script>
+/* ═══════════════════════════════════════════
+   THEME TOGGLE
+═══════════════════════════════════════════ */
+function toggleTheme(){
+  const root=document.documentElement;
+  const isDark=root.getAttribute('data-theme')==='dark';
+  root.setAttribute('data-theme',isDark?'light':'dark');
+  document.getElementById('theme-btn').textContent=isDark?'🌙':'☀️';
+  try{localStorage.setItem('lab270-theme',isDark?'light':'dark');}catch(e){}
+}
+(function(){
+  try{
+    const saved=localStorage.getItem('lab270-theme');
+    if(saved){
+      document.documentElement.setAttribute('data-theme',saved);
+      document.getElementById('theme-btn').textContent=saved==='light'?'🌙':'☀️';
+    }
+  }catch(e){}
+})();
+
 /* ═══════════════════════════════════════════
    TAB CYCLING
 ═══════════════════════════════════════════ */
@@ -466,15 +633,21 @@ document.querySelector('main').addEventListener('mouseleave',()=>{if(cycleOn)res
    PROJECT DETAIL VIEWER
 ═══════════════════════════════════════════ */
 let pvPages=[], pvCur=0, pvCycleOn=true, pvCycleId=null, pvProgId=null, pvMs=8000, pvProgStart=null;
+let pvEditMode=false, pvCurrentProj=null;
 
 function openProjViewer(proj){
   if(cycleOn){clearInterval(cycleId);cancelAnimationFrame(progId);}
-  pvPages = buildPages(proj);
+  pvCurrentProj=JSON.parse(JSON.stringify(proj)); // deep copy
+  pvEditMode=false;
+  pvPages=buildPages(pvCurrentProj);
   pvCur=0;
   renderPvPages();
   document.getElementById('proj-viewer').classList.add('open');
   pvGoPage(0);
   if(pvCycleOn) pvRestartCycle();
+  document.getElementById('pv-edit-bar').classList.remove('show');
+  document.getElementById('pv-edit-btn').classList.remove('on');
+  document.getElementById('proj-viewer').removeAttribute('data-edit-mode');
 }
 
 function closeProjViewer(){
@@ -484,11 +657,27 @@ function closeProjViewer(){
   if(cycleOn) restartCycle();
 }
 
+function pvToggleEdit(){
+  pvEditMode=!pvEditMode;
+  const btn=document.getElementById('pv-edit-btn');
+  const bar=document.getElementById('pv-edit-bar');
+  const viewer=document.getElementById('proj-viewer');
+  if(pvEditMode){
+    btn.textContent='✅ Done editing'; btn.classList.add('on');
+    bar.classList.add('show');
+    viewer.setAttribute('data-edit-mode','1');
+    if(pvCycleOn) pvToggleCycle(); // pause while editing
+  } else {
+    btn.textContent='✏️ Edit pages'; btn.classList.remove('on');
+    bar.classList.remove('show');
+    viewer.removeAttribute('data-edit-mode');
+  }
+  updateDelBtnVisibility();
+}
+
 function buildPages(proj){
   const pages=[];
-  // PAGE 1: hero
-  pages.push({type:'hero', proj});
-  // remaining pages from proj.pages array
+  pages.push({type:'hero',proj});
   (proj.pages||[]).forEach(pg=>pages.push(pg));
   return pages;
 }
@@ -499,27 +688,56 @@ function renderPvPages(){
   pvPages.forEach((pg,i)=>{
     const div=document.createElement('div');
     div.className='pv-page'; div.id='pvp-'+i;
-    div.innerHTML=renderPage(pg);
+    div.innerHTML=renderPage(pg,i);
     stage.appendChild(div);
   });
-  // dots
   const dots=document.getElementById('pv-dots');
   dots.innerHTML=pvPages.map((_,i)=>`<div class="pv-dot${i===0?' on':''}" onclick="pvGoPage(${i})"></div>`).join('');
 }
 
-function renderPage(pg){
+function renderPage(pg, pageIdx){
   switch(pg.type){
-    case 'hero':      return heroPage(pg.proj);
-    case 'photos':    return photosPage(pg);
-    case 'video':     return videoPage(pg);
-    case 'findings':  return findingsPage(pg);
-    case 'text':      return textPage(pg);
-    case 'mixed':     return mixedPage(pg);
-    default:          return `<div style="padding:40px;color:var(--txt2)">Unknown page type: ${pg.type}</div>`;
+    case 'hero':       return heroPage(pg.proj,pageIdx);
+    case 'photos':     return photosPage(pg,pageIdx);
+    case 'video':      return videoPage(pg,pageIdx);
+    case 'findings':   return findingsPage(pg,pageIdx);
+    case 'text':       return textPage(pg,pageIdx);
+    case 'conference': return conferencePage(pg,pageIdx);
+    case 'discussion': return discussionPage(pg,pageIdx);
+    case 'mixed':      return mixedPage(pg,pageIdx);
+    default: return `<div style="padding:40px;color:var(--txt2)">Unknown page type: ${pg.type}</div>`;
   }
 }
 
-function heroPage(proj){
+/* ── editable helpers ── */
+function ef(val,pgIdx,field,tag='span',style=''){
+  // editable field: renders as contenteditable span in edit mode
+  const esc=String(val||'').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+  return `<${tag} class="editable-field" contenteditable="true"
+    data-pg="${pgIdx}" data-field="${field}"
+    oninput="pvFieldEdit(this)"
+    style="${style}">${esc}</${tag}>`;
+}
+
+function pvFieldEdit(el){
+  const pgIdx=parseInt(el.dataset.pg);
+  const field=el.dataset.field;
+  if(pgIdx===0){
+    // hero page — editing proj fields
+    pvCurrentProj[field]=el.textContent;
+    pvPages[0].proj=pvCurrentProj;
+  } else {
+    const pg=pvPages[pgIdx];
+    // nested field like "items.0.title"
+    const parts=field.split('.');
+    let obj=pg;
+    for(let i=0;i<parts.length-1;i++) obj=obj[parts[i]];
+    obj[parts[parts.length-1]]=el.textContent;
+  }
+}
+
+/* ── HERO PAGE ── */
+function heroPage(proj,pgIdx){
   const memberChips=(proj.members||[]).map((m,i)=>{
     const mem=MEMBERS_MAP[m]||{name:m};
     const av=mem.photo
@@ -527,14 +745,12 @@ function heroPage(proj){
       :`<div class="pv-mini-av ac${i%8}" style="width:24px;height:24px;font-size:9px">${initials(m)}</div>`;
     return `<div class="pv-hero-member">${av}<span>${m}</span></div>`;
   }).join('');
-
   const img=proj.photo?`<img class="pv-hero-img" src="${proj.photo}" alt="${proj.title}" onerror="this.style.display='none'">` :'';
-
   return `<div class="pv-hero">
     <div class="pv-hero-label">${proj._kind||'Project'} · ${badge(proj.status)}</div>
-    <div class="pv-hero-title">${proj.title}</div>
+    <div class="pv-hero-title">${ef(proj.title,pgIdx,'title','span','font-size:inherit;font-weight:inherit;letter-spacing:inherit;line-height:inherit;display:block')}</div>
     ${img}
-    <div class="pv-hero-abstract">${proj.abstract||proj.description||''}</div>
+    <div class="pv-hero-abstract">${ef(proj.abstract||proj.description||'',pgIdx,'abstract','span','font-size:inherit;line-height:inherit;display:block')}</div>
     <div class="pv-hero-meta">
       <div style="font-size:11px;color:var(--txt3)">Team</div>
       <div class="pv-hero-team">${memberChips}</div>
@@ -542,30 +758,32 @@ function heroPage(proj){
   </div>`;
 }
 
-function photosPage(pg){
+/* ── PHOTOS PAGE ── */
+function photosPage(pg,pgIdx){
   const items=pg.items||[];
-  const cols=Math.min(3,items.length);
+  const cols=Math.min(3,Math.max(1,items.length));
   const colCls=['','cols1','cols2','cols3'][cols]||'cols3';
-  const media=items.map(item=>{
-    if(item.video_file){
-      return `<div class="pv-photo-item">
-        <video controls src="${item.video_file}"></video>
-        ${item.caption?`<div class="pv-photo-cap">${item.caption}</div>`:''}
-      </div>`;
-    }
-    return `<div class="pv-photo-item">
-      <img src="${item.src}" alt="${item.caption||''}" onerror="this.style.display='none'">
-      ${item.caption?`<div class="pv-photo-cap">${item.caption}</div>`:''}
+  const media=items.map((item,ii)=>{
+    let media='';
+    if(item.video_file) media=`<video controls src="${item.video_file}"></video>`;
+    else if(item.src) media=`<img src="${item.src}" alt="${item.caption||''}" onerror="this.style.display='none'">`;
+    else media=`<div class="photo-placeholder">📷 No image — add URL in edit mode</div>`;
+    return `<div class="pv-photo-item finding-wrap">
+      <button class="item-del-btn" onclick="pvDeleteItem(${pgIdx},${ii},'items')">✕</button>
+      ${media}
+      <div class="pv-photo-cap">${ef(item.caption||'',pgIdx,`items.${ii}.caption`)}</div>
     </div>`;
   }).join('');
   return `<div class="pv-photo-page">
-    <h2>${pg.title||'Photos'}</h2>
-    ${pg.description?`<p style="font-size:13px;color:var(--txt2)">${pg.description}</p>`:''}
+    <h2>${ef(pg.title||'Photos',pgIdx,'title')}</h2>
+    ${pg.description?`<p style="font-size:13px;color:var(--txt2)">${ef(pg.description,pgIdx,'description')}</p>`:''}
     <div class="pv-photo-grid ${colCls}">${media}</div>
+    <button class="add-item-btn" onclick="openModal('photo',${pgIdx})" style="display:none" id="add-photo-${pgIdx}">+ Add photo / video</button>
   </div>`;
 }
 
-function videoPage(pg){
+/* ── VIDEO PAGE ── */
+function videoPage(pg,pgIdx){
   let embed='';
   if(pg.youtube){
     const id=pg.youtube.match(/(?:v=|youtu\.be\/)([^&?]+)/)?.[1]||pg.youtube;
@@ -574,57 +792,247 @@ function videoPage(pg){
     embed=`<div class="pv-video-wrap"><iframe src="https://player.vimeo.com/video/${pg.vimeo}" frameborder="0" allowfullscreen></iframe></div>`;
   } else if(pg.src){
     embed=`<div class="pv-video-wrap"><video controls src="${pg.src}"></video></div>`;
+  } else {
+    embed=`<div class="video-placeholder"><span style="font-size:32px">▶️</span><span>No video — add URL in edit mode</span></div>`;
   }
   return `<div class="pv-video-page">
-    <h2>${pg.title||'Video'}</h2>
-    ${pg.description?`<p style="font-size:13px;color:var(--txt2);margin-bottom:10px">${pg.description}</p>`:''}
+    <h2>${ef(pg.title||'Video',pgIdx,'title')}</h2>
+    ${pg.description?`<p style="font-size:13px;color:var(--txt2);margin-bottom:10px">${ef(pg.description,pgIdx,'description')}</p>`:''}
     ${embed}
+    <div style="margin-top:10px;font-size:12px;color:var(--txt3)" id="vid-url-edit-${pgIdx}"></div>
   </div>`;
 }
 
-function findingsPage(pg){
+/* ── FINDINGS PAGE ── */
+function findingsPage(pg,pgIdx){
   const icons={finding:'🔍',inference:'💡',result:'✅',warning:'⚠️'};
-  const cards=(pg.items||[]).map(item=>`
-    <div class="pv-finding-card fi-${item.type||'finding'}">
+  const cards=(pg.items||[]).map((item,ii)=>`
+    <div class="pv-finding-card fi-${item.type||'finding'} finding-wrap" style="position:relative">
+      <button class="item-del-btn" onclick="pvDeleteItem(${pgIdx},${ii},'items')">✕ Remove</button>
       <div class="pv-finding-icon">${icons[item.type||'finding']||'🔎'}</div>
-      <div>
-        <div class="pv-finding-title">${item.title}</div>
-        <div class="pv-finding-body">${item.body}</div>
+      <div style="flex:1">
+        <div class="pv-finding-title">${ef(item.title,pgIdx,`items.${ii}.title`)}</div>
+        <div class="pv-finding-body">${ef(item.body,pgIdx,`items.${ii}.body`)}</div>
       </div>
     </div>`).join('');
   return `<div class="pv-findings-page">
-    <h2>${pg.title||'Findings &amp; Inferences'}</h2>
-    ${pg.description?`<p style="font-size:13px;color:var(--txt2);margin-bottom:4px">${pg.description}</p>`:''}
+    <h2>${ef(pg.title||'Findings & Inferences',pgIdx,'title')}</h2>
+    ${pg.description?`<p style="font-size:13px;color:var(--txt2);margin-bottom:4px">${ef(pg.description,pgIdx,'description')}</p>`:''}
     ${cards}
+    <button class="add-item-btn" onclick="openModal('finding',${pgIdx})" id="add-finding-${pgIdx}" style="display:none">+ Add finding / result</button>
   </div>`;
 }
 
-function textPage(pg){
-  const paras=(pg.paragraphs||[pg.body||'']).map(p=>`<p class="pv-text-body">${p}</p>`).join('');
+/* ── TEXT PAGE ── */
+function textPage(pg,pgIdx){
+  const paras=(pg.paragraphs||[pg.body||'']).map((p,ii)=>`
+    <div style="position:relative;margin-bottom:2px" class="finding-wrap">
+      <button class="item-del-btn" onclick="pvDeleteItem(${pgIdx},${ii},'paragraphs')">✕</button>
+      <p class="pv-text-body">${ef(p,pgIdx,`paragraphs.${ii}`)}</p>
+    </div>`).join('');
   return `<div class="pv-text-page">
-    <h2>${pg.title||''}</h2>
+    <h2>${ef(pg.title||'',pgIdx,'title')}</h2>
     ${paras}
+    <button class="add-item-btn" onclick="openModal('paragraph',${pgIdx})" id="add-para-${pgIdx}" style="display:none">+ Add paragraph</button>
   </div>`;
 }
 
-function mixedPage(pg){
-  const left=pg.left||{};
-  const right=pg.right||{};
+/* ── CONFERENCE PAGE ── */
+function conferencePage(pg,pgIdx){
+  const items=(pg.items||[]).map((c,ii)=>`
+    <div class="conf-card finding-wrap" style="position:relative">
+      <button class="item-del-btn" onclick="pvDeleteItem(${pgIdx},${ii},'items')">✕ Remove</button>
+      <div class="conf-name">${ef(c.name||'Conference',pgIdx,`items.${ii}.name`)}</div>
+      <div class="conf-venue">${ef(c.venue||'',pgIdx,`items.${ii}.venue`)}</div>
+      <div class="conf-desc">${ef(c.description||'',pgIdx,`items.${ii}.description`)}</div>
+      <div class="conf-meta">
+        ${c.date?`<span class="conf-chip">📅 ${ef(c.date,pgIdx,`items.${ii}.date`)}</span>`:''}
+        ${c.presenters?`<span class="conf-chip">🎤 ${ef(c.presenters,pgIdx,`items.${ii}.presenters`)}</span>`:''}
+        ${c.type?`<span class="conf-chip">${ef(c.type,pgIdx,`items.${ii}.type`)}</span>`:''}
+      </div>
+    </div>`).join('');
+  return `<div class="pv-conf-page">
+    <h2>${ef(pg.title||'Conference & Presentations',pgIdx,'title')}</h2>
+    ${pg.description?`<p style="font-size:13px;color:var(--txt2);margin-bottom:4px">${ef(pg.description,pgIdx,'description')}</p>`:''}
+    ${items}
+    <button class="add-item-btn" onclick="openModal('conf',${pgIdx})" id="add-conf-${pgIdx}" style="display:none">+ Add conference / presentation</button>
+  </div>`;
+}
+
+/* ── DISCUSSION PAGE ── */
+function discussionPage(pg,pgIdx){
+  const msgs=(pg.messages||[]).map((m,ii)=>`
+    <div class="discuss-msg finding-wrap">
+      <button class="item-del-btn" onclick="pvDeleteItem(${pgIdx},${ii},'messages')">✕</button>
+      <div class="discuss-av ac${ii%8}" style="width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0">${initials(m.author||'?')}</div>
+      <div style="flex:1">
+        <div class="discuss-meta"><strong>${ef(m.author||'',pgIdx,`messages.${ii}.author`)}</strong> · ${ef(m.date||'',pgIdx,`messages.${ii}.date`)}</div>
+        <div class="discuss-body">${ef(m.body||'',pgIdx,`messages.${ii}.body`)}</div>
+      </div>
+    </div>`).join('');
+  return `<div class="pv-discuss-page">
+    <h2>${ef(pg.title||'Discussion',pgIdx,'title')}</h2>
+    ${pg.description?`<p style="font-size:13px;color:var(--txt2);margin-bottom:8px">${ef(pg.description,pgIdx,'description')}</p>`:''}
+    <div class="discuss-thread">${msgs||'<div style="padding:20px;text-align:center;color:var(--txt3)">No messages yet — add one in edit mode</div>'}</div>
+    <button class="add-item-btn" onclick="openModal('msg',${pgIdx})" id="add-msg-${pgIdx}" style="display:none">+ Add message</button>
+  </div>`;
+}
+
+/* ── MIXED PAGE ── */
+function mixedPage(pg,pgIdx){
   const renderBlock=b=>{
-    if(b.type==='photo') return `<img src="${b.src}" alt="${b.caption||''}" style="width:100%;border-radius:var(--r);border:0.5px solid var(--border);object-fit:cover;max-height:320px">`;
+    if(!b) return '';
+    if(b.type==='photo') return `<img src="${b.src}" alt="${b.caption||''}" style="width:100%;border-radius:10px;border:1px solid var(--border);object-fit:cover;max-height:320px">`;
     if(b.type==='text') return `<div style="font-size:14px;color:var(--txt2);line-height:1.75">${(b.paragraphs||[b.body||'']).join('<br><br>')}</div>`;
-    if(b.type==='findings') return findingsPage(b).replace('<div class="pv-findings-page">','<div>').replace('</div>','');
     return '';
   };
   return `<div class="pv-mixed-page">
-    <h2>${pg.title||''}</h2>
+    <h2>${ef(pg.title||'',pgIdx,'title')}</h2>
     <div class="pv-mixed-grid">
-      <div>${renderBlock(left)}</div>
-      <div>${renderBlock(right)}</div>
+      <div>${renderBlock(pg.left)}</div>
+      <div>${renderBlock(pg.right)}</div>
     </div>
   </div>`;
 }
 
+/* ── ADD / DELETE items ── */
+let modalCtx={};
+
+function openModal(type,pgIdx){
+  modalCtx={type,pgIdx};
+  const modal=document.getElementById('add-item-modal');
+  const title=document.getElementById('modal-title');
+  const body=document.getElementById('modal-body');
+  if(type==='finding'){
+    title.textContent='Add finding / result';
+    body.innerHTML=`
+      <div class="modal-field"><label>Type</label>
+        <select id="mf-type"><option value="finding">🔍 Finding</option><option value="inference">💡 Inference</option><option value="result">✅ Result</option><option value="warning">⚠️ Warning</option></select>
+      </div>
+      <div class="modal-field"><label>Title</label><input id="mf-title" placeholder="Short title"></div>
+      <div class="modal-field"><label>Body</label><textarea id="mf-body" placeholder="Description..."></textarea></div>`;
+  } else if(type==='paragraph'){
+    title.textContent='Add paragraph';
+    body.innerHTML=`<div class="modal-field"><label>Paragraph text</label><textarea id="mf-para" placeholder="Text..."></textarea></div>`;
+  } else if(type==='photo'){
+    title.textContent='Add photo / video';
+    body.innerHTML=`
+      <div class="modal-field"><label>Image URL (or leave blank)</label><input id="mf-src" placeholder="https://..."></div>
+      <div class="modal-field"><label>Caption</label><input id="mf-caption" placeholder="Caption text"></div>`;
+  } else if(type==='conf'){
+    title.textContent='Add conference / presentation';
+    body.innerHTML=`
+      <div class="modal-field"><label>Conference name</label><input id="mf-name" placeholder="ICRA 2026"></div>
+      <div class="modal-field"><label>Venue / location</label><input id="mf-venue" placeholder="Seattle, WA"></div>
+      <div class="modal-field"><label>Date</label><input id="mf-date" placeholder="July 2026"></div>
+      <div class="modal-field"><label>Presenters</label><input id="mf-pres" placeholder="Carlos Reyes, Kwame Asante"></div>
+      <div class="modal-field"><label>Description</label><textarea id="mf-desc" placeholder="What was presented..."></textarea></div>`;
+  } else if(type==='msg'){
+    title.textContent='Add discussion message';
+    body.innerHTML=`
+      <div class="modal-field"><label>Author</label><input id="mf-author" placeholder="Dr. Martínez"></div>
+      <div class="modal-field"><label>Date</label><input id="mf-date" placeholder="June 5, 2026"></div>
+      <div class="modal-field"><label>Message</label><textarea id="mf-body" placeholder="Message..."></textarea></div>`;
+  }
+  modal.classList.add('open');
+}
+
+function closeModal(){
+  document.getElementById('add-item-modal').classList.remove('open');
+}
+
+function modalConfirm(){
+  const {type,pgIdx}=modalCtx;
+  const pg=pvPages[pgIdx];
+  if(type==='finding'){
+    if(!pg.items) pg.items=[];
+    pg.items.push({
+      type:document.getElementById('mf-type').value,
+      title:document.getElementById('mf-title').value,
+      body:document.getElementById('mf-body').value,
+    });
+  } else if(type==='paragraph'){
+    if(!pg.paragraphs) pg.paragraphs=[];
+    pg.paragraphs.push(document.getElementById('mf-para').value);
+  } else if(type==='photo'){
+    if(!pg.items) pg.items=[];
+    pg.items.push({src:document.getElementById('mf-src').value,caption:document.getElementById('mf-caption').value});
+  } else if(type==='conf'){
+    if(!pg.items) pg.items=[];
+    pg.items.push({
+      name:document.getElementById('mf-name').value,
+      venue:document.getElementById('mf-venue').value,
+      date:document.getElementById('mf-date').value,
+      presenters:document.getElementById('mf-pres').value,
+      description:document.getElementById('mf-desc').value,
+    });
+  } else if(type==='msg'){
+    if(!pg.messages) pg.messages=[];
+    pg.messages.push({
+      author:document.getElementById('mf-author').value,
+      date:document.getElementById('mf-date').value,
+      body:document.getElementById('mf-body').value,
+    });
+  }
+  closeModal();
+  renderPvPages();
+  pvGoPage(pgIdx);
+  // re-show add buttons
+  updateAddButtons();
+}
+
+function pvDeleteItem(pgIdx,itemIdx,arrKey){
+  const pg=pvPages[pgIdx];
+  if(pg[arrKey]) pg[arrKey].splice(itemIdx,1);
+  renderPvPages();
+  pvGoPage(pgIdx);
+  updateAddButtons();
+}
+
+function pvAddPage(){
+  const type=document.getElementById('new-page-type').value;
+  const defaults={
+    text:{type:'text',title:'New page',paragraphs:['Enter text here...']},
+    photos:{type:'photos',title:'Photos',items:[]},
+    findings:{type:'findings',title:'Findings',items:[]},
+    video:{type:'video',title:'Video',src:''},
+    conference:{type:'conference',title:'Conference & Presentations',items:[]},
+    discussion:{type:'discussion',title:'Discussion',messages:[]},
+  };
+  const newPg={...defaults[type]};
+  pvPages.push(newPg);
+  renderPvPages();
+  const newIdx=pvPages.length-1;
+  pvGoPage(newIdx);
+  updateAddButtons();
+}
+
+function pvDeleteCurrentPage(){
+  if(pvCur===0){alert('Cannot delete the title page.');return;}
+  if(!confirm('Delete this page?')) return;
+  pvPages.splice(pvCur,1);
+  renderPvPages();
+  pvGoPage(Math.max(0,pvCur-1));
+  updateAddButtons();
+}
+
+function updateAddButtons(){
+  // show all add-item buttons when in edit mode
+  if(!pvEditMode) return;
+  pvPages.forEach((_,i)=>{
+    ['add-photo-','add-finding-','add-para-','add-conf-','add-msg-'].forEach(pfx=>{
+      const el=document.getElementById(pfx+i);
+      if(el) el.style.display='block';
+    });
+  });
+}
+
+function updateDelBtnVisibility(){
+  document.getElementById('del-cur-page-btn').style.display=pvEditMode?'block':'none';
+  if(pvEditMode) updateAddButtons();
+}
+
+/* ── NAVIGATION ── */
 function pvGoPage(i){
   pvCur=i;
   document.querySelectorAll('.pv-page').forEach((p,j)=>p.classList.toggle('on',j===i));
@@ -633,14 +1041,11 @@ function pvGoPage(i){
   document.getElementById('pv-prev').disabled=i===0;
   document.getElementById('pv-next').disabled=i===pvPages.length-1;
   if(pvCycleOn) pvRestartCycle();
-  // scroll stage to top
-  document.querySelectorAll('.pv-page').forEach(p=>{ p.scrollTop=0; });
+  document.querySelectorAll('.pv-page').forEach(p=>{p.scrollTop=0;});
+  if(pvEditMode) updateAddButtons();
 }
 
-function pvNav(dir){
-  const next=pvCur+dir;
-  if(next>=0&&next<pvPages.length) pvGoPage(next);
-}
+function pvNav(dir){const n=pvCur+dir;if(n>=0&&n<pvPages.length) pvGoPage(n);}
 
 function pvStartProg(){
   const bar=document.getElementById('pv-prog-bar');
@@ -656,7 +1061,7 @@ function pvRestartCycle(){
   clearInterval(pvCycleId); pvStartProg();
   pvCycleId=setInterval(()=>{
     if(pvCur<pvPages.length-1) pvGoPage(pvCur+1);
-    else{ clearInterval(pvCycleId); cancelAnimationFrame(pvProgId); document.getElementById('pv-prog-bar').style.width='100%'; }
+    else{clearInterval(pvCycleId);cancelAnimationFrame(pvProgId);document.getElementById('pv-prog-bar').style.width='100%';}
   },pvMs);
 }
 function pvToggleCycle(){
@@ -669,18 +1074,27 @@ function pvSetSpeed(v){pvMs=v*1000;document.getElementById('pv-speed-lbl').textC
 document.getElementById('pv-stage').addEventListener('mouseenter',()=>{if(pvCycleOn){clearInterval(pvCycleId);cancelAnimationFrame(pvProgId);}});
 document.getElementById('pv-stage').addEventListener('mouseleave',()=>{if(pvCycleOn&&document.getElementById('proj-viewer').classList.contains('open'))pvRestartCycle();});
 
+/* keyboard nav */
+document.addEventListener('keydown',e=>{
+  if(!document.getElementById('proj-viewer').classList.contains('open')) return;
+  if(e.target.classList.contains('editable-field')) return;
+  if(e.key==='ArrowRight'||e.key==='ArrowDown') pvNav(1);
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp') pvNav(-1);
+  if(e.key==='Escape') closeProjViewer();
+});
+
 /* ═══════════════════════════════════════════
    HELPERS
 ═══════════════════════════════════════════ */
 let MEMBERS_MAP={};
-function initials(n){return n.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();}
+function initials(n){return String(n).split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();}
 function avHTML(p,idx,size=48){
   const cls='ac'+(idx%8);
   if(p&&p.photo) return `<div class="avatar" style="width:${size}px;height:${size}px"><img src="${p.photo}" alt="${p.name}" onerror="this.parentElement.innerHTML='<span>${initials(p.name)}</span>'" loading="lazy"></div>`;
   return `<div class="avatar ${cls}" style="width:${size}px;height:${size}px;font-size:${Math.round(size*.33)}px">${p?initials(p.name):''}</div>`;
 }
 function badge(s){
-  const m={online:'ok',available:'ok',operational:'ok',active:'ok',done:'ok',warning:'warn',busy:'warn',charging:'warn',maintenance:'warn',offline:'err',error:'err',broken:'err',idle:'off',off:'off',inactive:'off'};
+  const m={online:'ok',available:'ok',operational:'ok',active:'ok',done:'ok',warning:'warn',busy:'warn',charging:'warn',maintenance:'warn',offline:'err',error:'err',broken:'err',idle:'off',off:'off',inactive:'off',idea:'info'};
   const cls=m[s]||'off';
   return `<span class="badge ${cls}"><span class="bdot"></span>${s}</span>`;
 }
@@ -693,7 +1107,7 @@ function render(data){
   document.getElementById('lab-name').textContent=data.lab.name;
   document.getElementById('lab-sub').textContent=data.lab.department;
   MEMBERS_MAP={};
-  data.members.forEach(m=>{ MEMBERS_MAP[m.name]=m; });
+  data.members.forEach(m=>{MEMBERS_MAP[m.name]=m;});
   renderOverview(data);
   renderPI(data.pi);
   renderStudents(data.members);
@@ -741,9 +1155,8 @@ function renderPI(pi){
 function renderStudents(members){
   document.getElementById('student-count').textContent=members.length+' members';
   const groups={};
-  members.forEach(m=>{ (groups[m.role]=groups[m.role]||[]).push(m); });
-  let html='';
-  let idx=0;
+  members.forEach(m=>{(groups[m.role]=groups[m.role]||[]).push(m);});
+  let html=''; let idx=0;
   Object.entries(groups).forEach(([role,list])=>{
     html+=`<div style="grid-column:1/-1;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.9px;color:var(--txt3);padding:4px 0 5px">${role}</div>`;
     list.forEach(m=>{
@@ -762,7 +1175,8 @@ function renderProjectGrid(projects,targetId,kind){
   document.getElementById(targetId).innerHTML=projects.map((p,i)=>{
     const thumb=p.photo?`<img class="proj-thumb" src="${p.photo}" alt="${p.title}" onerror="this.style.display='none'">`
       :`<div class="proj-thumb-ph">${kind==='past'?'📦':'🤖'}</div>`;
-    return `<div class="proj-card ${kind==='past'?'past':''}" onclick="openProjViewer(${JSON.stringify({...p,_kind:kind==='past'?'Past project':'Active project'}).replace(/"/g,'&quot;')})">
+    const projData=JSON.stringify({...p,_kind:kind==='past'?'Past project':'Active project'}).replace(/"/g,'&quot;');
+    return `<div class="proj-card ${kind==='past'?'past':''}" onclick="openProjViewer(${projData})">
       <div class="proj-accent"></div>
       ${thumb}
       <div class="proj-body">
@@ -853,17 +1267,34 @@ function clock(){
   document.getElementById('dateline').textContent=n.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
 }
 
+/* ═══════════════════════════════════════════
+   AUTO-REFRESH every 2 minutes
+═══════════════════════════════════════════ */
+let lastRefresh=Date.now();
 async function loadData(){
-  try{ const r=await fetch('lab270-data.json?t='+Date.now()); render(await r.json()); }
-  catch(e){ render(DEMO); }
+  try{
+    const r=await fetch('lab270-data.json?t='+Date.now());
+    if(!r.ok) throw new Error('fetch failed');
+    const data=await r.json();
+    render(data);
+    lastRefresh=Date.now();
+    document.getElementById('refresh-status').textContent='Live · '+new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false});
+  }catch(e){
+    render(DEMO);
+    document.getElementById('refresh-status').textContent='Offline (demo)';
+  }
 }
 
-/* ── DEMO DATA ── */
+setInterval(loadData, 2*60*1000); // refresh every 2 minutes
+
+/* ══════════════════════════════════════
+   DEMO DATA
+══════════════════════════════════════ */
 const DEMO={
   lab:{name:"Lab 270 — Distributed Robotics Lab",department:"Department of Computer Science & Engineering"},
   pi:{name:"Dr. Ana Martínez",title:"Associate Professor",department:"Dept. of CS & Engineering",photo:"",
-    bio:"Dr. Martínez leads the Distributed Robotics Lab, focusing on multi-agent coordination, swarm intelligence, and human-robot interaction in unstructured environments.",
-    interests:["Multi-robot systems","Swarm intelligence","ROS 2","Human-robot interaction"],
+    bio:"Dr. Martínez leads the Distributed Robotics Lab, focusing on multi-agent coordination, swarm intelligence, and human-robot interaction in unstructured environments. She joined the faculty in 2018 after a postdoc at MIT CSAIL.",
+    interests:["Multi-robot systems","Swarm intelligence","ROS 2","Human-robot interaction","Sim-to-real transfer"],
     email:"a.martinez@university.edu",office:"ENG 270B",website:"https://example.com",scholar:"https://scholar.google.com"},
   members:[
     {name:"Carlos Reyes",  role:"PhD Student",  year:"3rd year",interests:["Swarm robotics","ROS 2"],    email:"c.reyes@university.edu",  photo:""},
@@ -876,70 +1307,70 @@ const DEMO={
     {name:"Amara Osei",    role:"Undergraduate",year:"Junior",  interests:["Electronics","Fabrication"], email:"a.osei@university.edu",   photo:""},
   ],
   projects:[
-    {
-      title:"SwarmNav: Decentralized navigation for robot swarms",
-      description:"Distributed planning algorithms for 10+ robot teams in GPS-denied environments.",
-      abstract:"SwarmNav investigates how a fleet of ground robots can navigate complex, GPS-denied indoor environments using only local sensing and peer-to-peer communication. Each robot runs a lightweight consensus algorithm that allows the swarm to collectively explore, map, and reach goals without any central coordinator.",
-      members:["Carlos Reyes","Kwame Asante"],status:"active",photo:"",
-      pages:[
-        {type:"photos",title:"Field experiments",description:"TurtleBot 4 swarm runs in the engineering building atrium.",
-          items:[{src:"",caption:"5-robot formation in corridor"},{src:"",caption:"Obstacle avoidance test"},{src:"",caption:"Goal-reaching experiment"}]},
-        {type:"findings",title:"Key findings & inferences",items:[
-          {type:"finding",title:"Communication radius is the critical parameter",body:"Experiments show swarm cohesion breaks down when robot-to-robot range drops below 4m. Above this threshold, the consensus algorithm converges reliably within 3 message rounds."},
-          {type:"finding",title:"Heterogeneous speeds degrade coordination",body:"Mixing TurtleBot 3 (0.22 m/s) and TurtleBot 4 (0.31 m/s) units in the same swarm introduces phase lag that accumulates over time. Homogeneous fleets converge 40% faster."},
-          {type:"inference",title:"Distributed Voronoi partitioning is the right abstraction",body:"Assigning each robot a Voronoi cell based on its current position naturally balances workload and prevents redundant exploration. This held across all 24 experiment runs."},
-          {type:"result",title:"98% area coverage achieved in under 8 minutes",body:"The swarm consistently covered 98% of the test arena (400 m²) in under 8 minutes across 12 repeated trials — a 3× improvement over the random-walk baseline."},
-        ]},
-        {type:"text",title:"Next steps",paragraphs:[
-          "The next phase of SwarmNav will move from simulation-validated algorithms into larger real-world deployments. We plan to scale from 5 to 20 robots and introduce heterogeneous sensing modalities — combining RGB-D cameras with 2D LiDAR.",
-          "We are also exploring how swarm behaviour changes under adversarial conditions: communication jamming, robot failure mid-mission, and dynamic obstacles such as people walking through the workspace.",
-          "A collaboration with the university's civil engineering department will allow us to test SwarmNav in a realistic disaster-response scenario inside a decommissioned building scheduled for demolition."
-        ]}
-      ]
-    },
-    {
-      title:"TactileGrasp: Sim-to-real manipulation learning",
-      description:"Training dexterous manipulation policies in simulation and transferring to physical arms.",
-      abstract:"TactileGrasp investigates how reinforcement learning policies trained entirely in physics simulation can be transferred to a real Franka Emika robot arm. The core challenge is the sim-to-real gap: simulator dynamics, contact models, and sensor noise rarely match physical reality. We apply domain randomisation and learned residual dynamics to close this gap.",
-      members:["Lena Fischer","Dr. Martínez"],status:"active",photo:"",
-      pages:[
-        {type:"photos",title:"Setup & experiments",items:[
-          {src:"",caption:"Franka arm with custom fingertip sensors"},{src:"",caption:"Simulation environment in Isaac Gym"}]},
-        {type:"findings",title:"Findings",items:[
-          {type:"finding",title:"Domain randomisation alone is insufficient for rigid objects",body:"Randomising friction, mass, and visual appearance in simulation reduced the sim-to-real gap significantly for soft objects but had limited effect on rigid cylindrical objects. Additional sensor noise injection was required."},
-          {type:"inference",title:"Tactile feedback adds more value than visual feedback for grasping",body:"Policies trained with simulated tactile input outperformed vision-only policies by 22 percentage points on unseen object geometries, suggesting that contact information is the more informative signal for grasping tasks."},
-          {type:"result",title:"87% grasp success rate on held-out objects",body:"The final policy achieved an 87% success rate on 30 unseen objects spanning 5 shape categories, compared to 61% for the vision-only baseline."},
-        ]}
-      ]
-    },
-    {
-      title:"SLAM++ for dynamic environments",
-      description:"Extending SLAM to handle moving objects in indoor warehouse scenarios.",
-      abstract:"Standard SLAM algorithms assume a static world. SLAM++ extends classical occupancy-grid and pose-graph SLAM to explicitly model, track, and remove dynamic objects — people, forklifts, moving boxes — allowing the robot to maintain an accurate map of the persistent scene while correctly associating sensor observations.",
-      members:["Priya Nair"],status:"active",photo:"",
-      pages:[
-        {type:"findings",title:"Findings & inferences",items:[
-          {type:"finding",title:"Moving objects corrupt pose-graph if not filtered",body:"Without dynamic object segmentation, 15% of keyframes in a busy warehouse aisle contained moving-object observations. These keyframes introduced systematic drift of 0.4 m per 100 m of travel."},
-          {type:"inference",title:"Semantic segmentation is a sufficient pre-filter",body:"A lightweight MobileNet-SSD running at 15 fps was sufficient to flag and exclude 94% of dynamic object observations before they entered the pose-graph, eliminating the drift at negligible computational cost on the GPU server."},
-        ]}
-      ]
-    },
-    {
-      title:"HRI Dashboard: Real-time robot monitoring",
-      description:"Web-based monitoring for live robot fleet telemetry.",
-      abstract:"The HRI Dashboard is a browser-based tool for real-time monitoring of heterogeneous robot fleets. It aggregates telemetry from ROS 2 topics over WebSockets, renders live maps, battery levels, and mission status, and provides a REST API for external systems — including the university hospital's facility management platform.",
-      members:["Sofia Lombardi","Tai Nguyen"],status:"active",photo:"",
-      pages:[
-        {type:"text",title:"System architecture",paragraphs:[
-          "The dashboard consists of a ROS 2 bridge node (Python, rclpy) that subscribes to all active robot topics and re-publishes them over a WebSocket server. The frontend is a single-page app built with vanilla JS and SVG-based map rendering.",
-          "A REST API layer (FastAPI) exposes read-only endpoints for integration with third-party systems. The hospital facility management platform polls /fleet/status every 30 seconds to display robot locations on their floor plan."
-        ]}
-      ]
-    }
+    {title:"SwarmNav: Decentralized navigation for robot swarms",
+     description:"Distributed planning algorithms for 10+ robot teams in GPS-denied environments.",
+     abstract:"SwarmNav investigates how a fleet of ground robots can navigate complex, GPS-denied indoor environments using only local sensing and peer-to-peer communication. Each robot runs a lightweight consensus algorithm that allows the swarm to collectively explore, map, and reach goals without any central coordinator.",
+     members:["Carlos Reyes","Kwame Asante"],status:"active",photo:"",
+     pages:[
+       {type:"photos",title:"Field experiments",description:"TurtleBot 4 swarm runs in the engineering building atrium.",
+        items:[{src:"",caption:"5-robot formation in corridor"},{src:"",caption:"Obstacle avoidance test"},{src:"",caption:"Goal-reaching experiment"}]},
+       {type:"findings",title:"Key findings & inferences",items:[
+         {type:"finding",title:"Communication radius is the critical parameter",body:"Swarm cohesion breaks down when robot-to-robot range drops below 4 m. Above this threshold, the consensus algorithm converges reliably within 3 message rounds."},
+         {type:"finding",title:"Heterogeneous speeds degrade coordination",body:"Mixing TurtleBot 3 and 4 units introduces phase lag that accumulates over time. Homogeneous fleets converge 40% faster."},
+         {type:"inference",title:"Distributed Voronoi partitioning is the right abstraction",body:"Assigning each robot a Voronoi cell naturally balances workload and prevents redundant exploration — held across all 24 experiment runs."},
+         {type:"result",title:"98% area coverage in under 8 minutes",body:"The swarm covered 98% of the 400 m² test arena in under 8 minutes across 12 repeated trials — a 3× improvement over the random-walk baseline."},
+       ]},
+       {type:"text",title:"Next steps",paragraphs:[
+         "The next phase will scale from 5 to 20 robots and introduce heterogeneous sensing modalities — combining RGB-D cameras with 2D LiDAR.",
+         "We are exploring swarm behaviour under adversarial conditions: communication jamming, robot failure mid-mission, and dynamic obstacles.",
+         "A collaboration with the civil engineering department will allow testing in a realistic disaster-response scenario."
+       ]},
+       {type:"conference",title:"Conference & Presentations",items:[
+         {name:"IEEE ICRA 2024",venue:"Yokohama, Japan",date:"May 2024",presenters:"Carlos Reyes, Kwame Asante",description:"Presented the decentralized multi-robot navigation paper. Best paper finalist.",type:"Oral presentation"},
+         {name:"IEEE ICRA 2026",venue:"Seattle, WA",date:"July 2026",presenters:"Carlos Reyes, Kwame Asante",description:"Upcoming — SwarmNav v2 results.",type:"Accepted"},
+       ]},
+     ]},
+    {title:"TactileGrasp: Sim-to-real manipulation learning",
+     description:"Training dexterous manipulation policies in simulation and transferring to physical arms.",
+     abstract:"TactileGrasp investigates how reinforcement learning policies trained entirely in physics simulation can be transferred to a real Franka Emika robot arm. We apply domain randomisation and learned residual dynamics to close the sim-to-real gap.",
+     members:["Lena Fischer","Dr. Martínez"],status:"active",photo:"",
+     pages:[
+       {type:"photos",title:"Setup & experiments",items:[
+         {src:"",caption:"Franka arm with custom fingertip sensors"},{src:"",caption:"Simulation environment in Isaac Gym"}]},
+       {type:"findings",title:"Findings",items:[
+         {type:"finding",title:"Domain randomisation alone is insufficient for rigid objects",body:"Randomising friction, mass, and visual appearance reduced the gap for soft objects but had limited effect on rigid cylindrical objects. Additional sensor noise injection was required."},
+         {type:"inference",title:"Tactile feedback adds more value than visual for grasping",body:"Policies trained with simulated tactile input outperformed vision-only policies by 22 percentage points on unseen object geometries."},
+         {type:"result",title:"87% grasp success rate on held-out objects",body:"The final policy achieved 87% success on 30 unseen objects across 5 shape categories, vs 61% for the vision-only baseline."},
+       ]},
+       {type:"discussion",title:"Discussion & notes",messages:[
+         {author:"Dr. Martínez",date:"May 30, 2026",body:"Great results on rigid objects this week. Let's make sure we benchmark against the tactile-only baseline before the RSS deadline."},
+         {author:"Lena Fischer",date:"May 31, 2026",body:"On it — will run the full ablation study today. Should have numbers by tomorrow."},
+       ]},
+     ]},
+    {title:"SLAM++ for dynamic environments",
+     description:"Extending SLAM to handle moving objects in indoor warehouse scenarios.",
+     abstract:"Standard SLAM algorithms assume a static world. SLAM++ explicitly models, tracks, and removes dynamic objects — people, forklifts, moving boxes — allowing the robot to maintain an accurate map while correctly associating observations.",
+     members:["Priya Nair"],status:"active",photo:"",
+     pages:[
+       {type:"findings",title:"Findings & inferences",items:[
+         {type:"finding",title:"Moving objects corrupt pose-graph if not filtered",body:"Without dynamic object segmentation, 15% of keyframes in a busy warehouse aisle contained moving-object observations, introducing systematic drift of 0.4 m per 100 m of travel."},
+         {type:"inference",title:"Semantic segmentation is a sufficient pre-filter",body:"A lightweight MobileNet-SSD at 15 fps was sufficient to flag and exclude 94% of dynamic object observations before they entered the pose-graph, eliminating drift at negligible cost."},
+       ]},
+     ]},
+    {title:"HRI Dashboard: Real-time robot monitoring",
+     description:"Web-based monitoring for live robot fleet telemetry.",
+     abstract:"The HRI Dashboard is a browser-based tool for real-time monitoring of heterogeneous robot fleets. It aggregates telemetry from ROS 2 topics over WebSockets, renders live maps, battery levels, and mission status, and provides a REST API for external systems.",
+     members:["Sofia Lombardi","Tai Nguyen"],status:"active",photo:"",
+     pages:[
+       {type:"text",title:"System architecture",paragraphs:[
+         "The dashboard consists of a ROS 2 bridge node (Python, rclpy) that subscribes to all active robot topics and re-publishes them over a WebSocket server. The frontend is a single-page app built with vanilla JS and SVG-based map rendering.",
+         "A REST API layer (FastAPI) exposes read-only endpoints for integration with third-party systems. The hospital facility management platform polls /fleet/status every 30 seconds to display robot locations on their floor plan."
+       ]},
+     ]},
   ],
   past_projects:[
     {title:"DroneFormation v1: Fixed-wing UAV coordination",description:"Coordinated flight of 4 fixed-wing UAVs in V-formation using distributed consensus.",abstract:"DroneFormation v1 demonstrated that a small fleet of fixed-wing UAVs could maintain stable V-formation flight using only onboard sensors and peer-to-peer RF communication — no ground-station coordination.",members:["Kwame Asante","Carlos Reyes"],status:"done",photo:"",
-      pages:[{type:"findings",title:"Outcomes",items:[{type:"result",title:"Stable formation maintained at 14 m/s",body:"The fleet maintained V-formation with less than 0.8 m mean positional error at cruising speed across all 8 outdoor flight tests."},{type:"inference",title:"Wind is the dominant disturbance",body:"95% of formation errors exceeding 1.5 m occurred during gusts above 6 m/s. Future work should focus on wind-aware trajectory prediction."}]}]},
+      pages:[{type:"findings",title:"Outcomes",items:[{type:"result",title:"Stable formation at 14 m/s",body:"The fleet maintained V-formation with less than 0.8 m mean positional error at cruising speed across all 8 outdoor flight tests."},{type:"inference",title:"Wind is the dominant disturbance",body:"95% of formation errors exceeding 1.5 m occurred during gusts above 6 m/s. Future work should focus on wind-aware trajectory prediction."}]}]},
     {title:"ChairBot: Assistive mobility robot",description:"Autonomous wheelchair navigation for hospital corridors. Piloted at University Medical Center.",abstract:"ChairBot is an autonomous navigation system retrofitted onto a standard powered wheelchair, enabling hands-free navigation through mapped hospital corridors via voice commands.",members:["Priya Nair","Dr. Martínez"],status:"done",photo:"",
       pages:[{type:"findings",title:"Pilot outcomes",items:[{type:"result",title:"97% successful navigation across 200 real trips",body:"Over a 3-week hospital pilot, ChairBot completed 194 of 200 requested trips without human intervention. The 6 failures were all caused by unexpected elevator outages."},{type:"inference",title:"Elevator reliability is the single point of failure",body:"Multi-floor navigation is entirely dependent on elevator availability. The system should implement floor-change queueing and fallback routing."}]}]},
   ],
@@ -1000,7 +1431,7 @@ const DEMO={
 
 initNav();
 clock(); setInterval(clock,1000);
-loadData(); setInterval(loadData,60000);
+loadData();
 restartCycle();
 </script>
 </body>
