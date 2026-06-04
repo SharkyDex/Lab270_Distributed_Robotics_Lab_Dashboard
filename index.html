@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab 270 — Distributed Robotics Lab</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d1117;--bg2:#161b22;--bg3:#1c2330;--bg4:#212936;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.14);
+  --txt:#e6edf3;--txt2:#8b949e;--txt3:#6e7681;
+  --accent:#2563eb;--accent-dim:#1d4ed844;
+  --green:#22c55e;--green-bg:rgba(34,197,94,0.12);
+  --amber:#f59e0b;--amber-bg:rgba(245,158,11,0.12);
+  --red:#ef4444;--red-bg:rgba(239,68,68,0.12);
+  --blue:#3b82f6;--blue-bg:rgba(59,130,246,0.12);
+  --purple:#a78bfa;--purple-bg:rgba(167,139,250,0.12);
+  --teal:#2dd4bf;--teal-bg:rgba(45,212,191,0.12);
+  --r:10px;--rs:6px;
+  font-family:'Segoe UI',system-ui,sans-serif;
+}
+body{background:var(--bg);color:var(--txt);min-height:100vh;font-size:14px;line-height:1.5;overflow-x:hidden}
+
+/* ── HEADER ── */
+header{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;border-bottom:0.5px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:200}
+.lab-logo{width:38px;height:38px;background:var(--accent);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff}
+.lab-name{font-size:16px;font-weight:600;letter-spacing:-0.3px}
+.lab-sub{font-size:11px;color:var(--txt2);margin-top:1px}
+.hdr-right{display:flex;align-items:center;gap:16px}
+#clock{font-family:monospace;font-size:20px;font-weight:500;letter-spacing:2px}
+#dateline{font-size:11px;color:var(--txt2);text-align:right;margin-top:1px}
+.ctrl-group{display:flex;align-items:center;gap:8px}
+.cbtn{background:var(--bg3);border:0.5px solid var(--border2);color:var(--txt2);border-radius:var(--rs);padding:5px 11px;font-size:12px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.cbtn:hover{color:var(--txt);border-color:var(--txt3)}
+.cbtn.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.spd{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--txt3)}
+.spd input{width:70px;accent-color:var(--accent)}
+
+/* ── PROGRESS ── */
+#prog-wrap{height:2px;background:var(--bg3)}
+#prog-bar{height:2px;background:var(--accent);width:0%}
+
+/* ── NAV ── */
+nav{display:flex;gap:2px;padding:7px 24px;background:var(--bg);border-bottom:0.5px solid var(--border);overflow-x:auto;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+.tab{padding:5px 12px;border-radius:var(--rs);font-size:12px;color:var(--txt2);cursor:pointer;white-space:nowrap;border:none;background:transparent;transition:background .15s,color .15s}
+.tab:hover{background:var(--bg3);color:var(--txt)}
+.tab.active{background:var(--accent);color:#fff}
+
+/* ── MAIN ── */
+main{padding:18px 24px}
+.section{display:none}
+.section.active{display:block}
+
+/* ── GENERIC ── */
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px}
+.gauto{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:13px}
+.card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:15px 17px}
+.card-title{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.9px;color:var(--txt3);margin-bottom:11px}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px}
+.sec-title{font-size:15px;font-weight:500}
+.sec-count{font-size:12px;color:var(--txt3)}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500}
+.bdot{width:6px;height:6px;border-radius:50%}
+.ok{background:var(--green-bg);color:var(--green)}.ok .bdot{background:var(--green)}
+.warn{background:var(--amber-bg);color:var(--amber)}.warn .bdot{background:var(--amber)}
+.err{background:var(--red-bg);color:var(--red)}.err .bdot{background:var(--red)}
+.info{background:var(--blue-bg);color:var(--blue)}.info .bdot{background:var(--blue)}
+.off{background:rgba(255,255,255,.05);color:var(--txt3)}.off .bdot{background:var(--txt3)}
+
+/* ── STAT ROW ── */
+.stat-row{display:flex;gap:9px;margin-bottom:14px}
+.stat{flex:1;background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--rs);padding:11px 13px}
+.stat-lbl{font-size:10px;color:var(--txt2);margin-bottom:2px;text-transform:uppercase;letter-spacing:.5px}
+.stat-val{font-size:24px;font-weight:500;letter-spacing:-.5px}
+
+/* ── AVATAR ── */
+.avatar{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;flex-shrink:0;overflow:hidden;background:var(--bg3)}
+.avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.ac0{background:#1e3a5f33;color:#3b82f6}.ac1{background:#1a3d2b33;color:#22c55e}
+.ac2{background:#3b1f6b33;color:#a78bfa}.ac3{background:#4a121233;color:#ef4444}
+.ac4{background:#3d2b0d33;color:#f59e0b}.ac5{background:#0d3d3d33;color:#2dd4bf}
+.ac6{background:#3d163333;color:#ec4899}.ac7{background:#1e2d3d33;color:#60a5fa}
+
+/* ── PERSON CARD ── */
+.person-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:13px;display:flex;flex-direction:column;gap:7px}
+.ph{display:flex;align-items:center;gap:10px}
+.pname{font-size:13px;font-weight:500}
+.prole{font-size:11px;color:var(--txt2)}
+.ptags{display:flex;flex-wrap:wrap;gap:4px}
+.tag{font-size:11px;padding:2px 7px;border-radius:4px;background:var(--bg3);color:var(--txt2);border:0.5px solid var(--border)}
+
+/* ── PI ── */
+.pi-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:20px;display:flex;gap:20px}
+.pi-photo{width:110px;height:110px;border-radius:10px;overflow:hidden;flex-shrink:0;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700}
+.pi-photo img{width:100%;height:100%;object-fit:cover}
+.pi-name{font-size:19px;font-weight:600;margin-bottom:3px}
+.pi-title{font-size:12px;color:var(--txt2);margin-bottom:9px}
+.pi-bio{font-size:12px;color:var(--txt2);line-height:1.65;margin-bottom:9px}
+.pi-links{display:flex;gap:6px;flex-wrap:wrap}
+.pi-link{font-size:11px;padding:4px 10px;border-radius:var(--rs);border:0.5px solid var(--border2);color:var(--txt2);text-decoration:none;background:var(--bg3)}
+
+/* ── STANDARD PROJECT CARD (grid view) ── */
+.proj-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column;cursor:pointer;transition:border-color .2s}
+.proj-card:hover{border-color:var(--border2)}
+.proj-accent{height:3px;background:var(--accent)}
+.proj-card.past .proj-accent{background:var(--txt3)}
+.proj-card.idea .proj-accent{background:var(--purple)}
+.proj-thumb{width:100%;height:120px;object-fit:cover;display:block;background:var(--bg3)}
+.proj-thumb-ph{width:100%;height:120px;background:var(--bg3);display:flex;align-items:center;justify-content:center;color:var(--txt3);font-size:26px}
+.proj-body{padding:12px 14px;flex:1;display:flex;flex-direction:column;gap:5px}
+.proj-title{font-size:13px;font-weight:500}
+.proj-desc{font-size:12px;color:var(--txt2);line-height:1.5;flex:1}
+.proj-foot{display:flex;justify-content:space-between;align-items:center;margin-top:5px}
+.proj-members{font-size:11px;color:var(--txt3)}
+.proj-detail-btn{font-size:11px;color:var(--accent);border:none;background:none;cursor:pointer;padding:0}
+
+/* ══════════════════════════════════════════
+   PROJECT DETAIL VIEWER
+══════════════════════════════════════════ */
+#proj-viewer{
+  display:none;
+  position:fixed;inset:0;
+  background:var(--bg);
+  z-index:300;
+  flex-direction:column;
+}
+#proj-viewer.open{display:flex}
+
+/* viewer header */
+.pv-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 28px;
+  border-bottom:0.5px solid var(--border);
+  flex-shrink:0;
+  gap:16px;
+}
+.pv-close{
+  background:var(--bg3);border:0.5px solid var(--border2);color:var(--txt2);
+  border-radius:var(--rs);padding:5px 13px;font-size:12px;cursor:pointer;
+  transition:all .15s;white-space:nowrap;
+}
+.pv-close:hover{color:var(--txt)}
+.pv-nav-row{display:flex;align-items:center;gap:10px}
+.pv-navbtn{
+  background:var(--bg3);border:0.5px solid var(--border2);color:var(--txt2);
+  border-radius:var(--rs);padding:5px 14px;font-size:13px;cursor:pointer;
+  transition:all .15s;
+}
+.pv-navbtn:hover{color:var(--txt);border-color:var(--txt3)}
+.pv-navbtn:disabled{opacity:.3;cursor:default}
+.pv-page-info{font-size:12px;color:var(--txt3);min-width:80px;text-align:center}
+.pv-dots{display:flex;gap:5px;align-items:center}
+.pv-dot{width:7px;height:7px;border-radius:50%;background:var(--bg3);border:0.5px solid var(--border2);cursor:pointer;transition:background .2s,transform .2s}
+.pv-dot.on{background:var(--accent);border-color:var(--accent);transform:scale(1.2)}
+
+/* viewer progress */
+#pv-prog-wrap{height:2px;background:var(--bg3);flex-shrink:0}
+#pv-prog-bar{height:2px;background:var(--accent);width:0%}
+
+/* viewer stage */
+.pv-stage{flex:1;overflow:hidden;position:relative}
+.pv-page{
+  position:absolute;inset:0;
+  overflow-y:auto;
+  opacity:0;pointer-events:none;
+  transition:opacity .35s;
+  padding:32px 48px;
+}
+.pv-page.on{opacity:1;pointer-events:auto}
+
+/* ── PAGE TYPES ── */
+
+/* HERO page */
+.pv-hero{
+  display:flex;flex-direction:column;justify-content:center;
+  min-height:100%;gap:20px;
+  max-width:900px;margin:0 auto;
+}
+.pv-hero-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--txt3)}
+.pv-hero-title{font-size:42px;font-weight:700;letter-spacing:-1px;line-height:1.15;color:var(--txt)}
+.pv-hero-img{
+  width:100%;max-height:300px;object-fit:cover;
+  border-radius:var(--r);border:0.5px solid var(--border);
+  margin:4px 0;
+}
+.pv-hero-abstract{font-size:15px;color:var(--txt2);line-height:1.75;max-width:740px}
+.pv-hero-meta{display:flex;gap:24px;flex-wrap:wrap;align-items:center;margin-top:4px}
+.pv-hero-team{display:flex;gap:8px;flex-wrap:wrap}
+.pv-hero-member{
+  display:flex;align-items:center;gap:7px;
+  background:var(--bg2);border:0.5px solid var(--border);
+  border-radius:20px;padding:4px 12px 4px 4px;
+  font-size:12px;
+}
+.pv-mini-av{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;overflow:hidden;flex-shrink:0}
+.pv-mini-av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+
+/* PHOTO page */
+.pv-photo-page{display:flex;flex-direction:column;gap:16px;max-width:1000px;margin:0 auto;width:100%}
+.pv-photo-page h2{font-size:22px;font-weight:600;letter-spacing:-.3px}
+.pv-photo-grid{display:grid;gap:10px}
+.pv-photo-grid.cols1{grid-template-columns:1fr}
+.pv-photo-grid.cols2{grid-template-columns:1fr 1fr}
+.pv-photo-grid.cols3{grid-template-columns:1fr 1fr 1fr}
+.pv-photo-item{display:flex;flex-direction:column;gap:6px}
+.pv-photo-item img{width:100%;border-radius:var(--r);border:0.5px solid var(--border);object-fit:cover;max-height:340px}
+.pv-photo-item video{width:100%;border-radius:var(--r);border:0.5px solid var(--border);max-height:340px}
+.pv-photo-cap{font-size:12px;color:var(--txt2);text-align:center}
+
+/* VIDEO page */
+.pv-video-page{display:flex;flex-direction:column;gap:16px;max-width:900px;margin:0 auto;width:100%}
+.pv-video-page h2{font-size:22px;font-weight:600;letter-spacing:-.3px}
+.pv-video-wrap{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:var(--r);border:0.5px solid var(--border)}
+.pv-video-wrap iframe,.pv-video-wrap video{position:absolute;inset:0;width:100%;height:100%}
+
+/* FINDINGS / INFERENCES page */
+.pv-findings-page{display:flex;flex-direction:column;gap:18px;max-width:900px;margin:0 auto;width:100%}
+.pv-findings-page h2{font-size:22px;font-weight:600;letter-spacing:-.3px}
+.pv-finding-card{
+  background:var(--bg2);border:0.5px solid var(--border);
+  border-radius:var(--r);padding:16px 18px;
+  display:flex;gap:14px;align-items:flex-start;
+}
+.pv-finding-icon{
+  width:36px;height:36px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;margin-top:1px;
+}
+.pv-finding-title{font-size:14px;font-weight:500;margin-bottom:4px}
+.pv-finding-body{font-size:13px;color:var(--txt2);line-height:1.6}
+.fi-finding .pv-finding-icon{background:var(--blue-bg)}
+.fi-inference .pv-finding-icon{background:var(--purple-bg)}
+.fi-result .pv-finding-icon{background:var(--green-bg)}
+.fi-warning .pv-finding-icon{background:var(--amber-bg)}
+
+/* TEXT page */
+.pv-text-page{display:flex;flex-direction:column;gap:14px;max-width:820px;margin:0 auto;width:100%}
+.pv-text-page h2{font-size:22px;font-weight:600;letter-spacing:-.3px}
+.pv-text-body{font-size:14px;color:var(--txt2);line-height:1.8}
+
+/* MIXED page */
+.pv-mixed-page{display:flex;flex-direction:column;gap:18px;max-width:1000px;margin:0 auto;width:100%}
+.pv-mixed-page h2{font-size:22px;font-weight:600;letter-spacing:-.3px}
+.pv-mixed-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+
+/* ── OTHER SECTIONS ── */
+.pub-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:13px 15px}
+.pub-title{font-size:13px;font-weight:500;margin-bottom:3px}
+.pub-authors{font-size:11px;color:var(--txt3);margin-bottom:5px}
+.pub-venue{font-size:11px;color:var(--txt2)}
+.device-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:12px 14px;display:flex;justify-content:space-between;align-items:center}
+.dname{font-size:13px;font-weight:500}.dspec{font-size:11px;color:var(--txt3);margin-top:2px}
+.robot-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:13px}
+.rname{font-size:13px;font-weight:500;margin-bottom:1px}.rtype{font-size:11px;color:var(--txt3);margin-bottom:7px}
+.bar-bg{width:100%;height:4px;background:var(--bg3);border-radius:2px;margin-top:2px}
+.bar-fill{height:100%;border-radius:2px;background:var(--accent)}
+.bar-fill.g{background:var(--green)}.bar-fill.a{background:var(--amber)}.bar-fill.r{background:var(--red)}
+.rlbl{display:flex;justify-content:space-between;font-size:11px;color:var(--txt2);margin-top:4px}
+.announce-card{background:var(--bg2);border:0.5px solid var(--border);border-left:3px solid var(--teal);border-radius:var(--r);padding:12px 14px;margin-bottom:8px}
+.ann-title{font-size:13px;font-weight:500;margin-bottom:3px}
+.ann-body{font-size:12px;color:var(--txt2);line-height:1.55}
+.ann-date{font-size:11px;color:var(--txt3);margin-top:4px}
+.news-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:12px 14px}
+.nsrc{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.ntitle{font-size:13px;font-weight:500;margin-bottom:3px;line-height:1.4}
+.ntime{font-size:11px;color:var(--txt3)}
+.event-row{display:flex;gap:13px;padding:10px 0;border-bottom:0.5px solid var(--border);align-items:flex-start}
+.event-row:last-child{border-bottom:none}
+.event-date{min-width:48px;text-align:center;background:var(--bg3);border-radius:var(--rs);padding:5px 3px;border:0.5px solid var(--border)}
+.emonth{font-size:10px;color:var(--txt2);text-transform:uppercase;letter-spacing:.4px}
+.eday{font-size:20px;font-weight:500;line-height:1.1}
+.etitle{font-size:13px;font-weight:500;margin-bottom:2px}
+.edesc{font-size:12px;color:var(--txt2)}
+.overview-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-bottom:15px}
+.ov-stat{background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--rs);padding:12px;text-align:center}
+.ov-num{font-size:28px;font-weight:600;letter-spacing:-1px}
+.ov-lbl{font-size:11px;color:var(--txt2);margin-top:1px}
+</style>
+</head>
+<body>
+
+<!-- PROJECT DETAIL VIEWER (fullscreen overlay) -->
+<div id="proj-viewer">
+  <div class="pv-header">
+    <button class="pv-close" onclick="closeProjViewer()">← Back to dashboard</button>
+    <div class="pv-nav-row">
+      <button class="pv-navbtn" id="pv-prev" onclick="pvNav(-1)">←</button>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:5px">
+        <div class="pv-page-info" id="pv-page-info">Page 1 of 1</div>
+        <div class="pv-dots" id="pv-dots"></div>
+      </div>
+      <button class="pv-navbtn" id="pv-next" onclick="pvNav(1)">→</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="cbtn" id="pv-play-btn" onclick="pvToggleCycle()">⏸ Pause</button>
+      <div class="spd">
+        <span>Page speed</span>
+        <input type="range" min="4" max="20" value="8" step="1" id="pv-speed" oninput="pvSetSpeed(this.value)">
+        <span id="pv-speed-lbl">8s</span>
+      </div>
+    </div>
+  </div>
+  <div id="pv-prog-wrap"><div id="pv-prog-bar"></div></div>
+  <div class="pv-stage" id="pv-stage"></div>
+</div>
+
+<header>
+  <div style="display:flex;align-items:center;gap:12px">
+    <div class="lab-logo">270</div>
+    <div>
+      <div class="lab-name" id="lab-name">Lab 270 — Distributed Robotics Lab</div>
+      <div class="lab-sub" id="lab-sub">Department of Computer Science &amp; Engineering</div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <div class="ctrl-group">
+      <button class="cbtn on" id="btn-play" onclick="toggleCycle()">⏸ Pause</button>
+      <button class="cbtn" onclick="prevTab()">←</button>
+      <button class="cbtn" onclick="nextTab()">→</button>
+      <div class="spd">
+        <span>Speed</span>
+        <input type="range" min="5" max="30" value="12" step="1" id="speed-slider" oninput="setSpeed(this.value)">
+        <span id="speed-lbl">12s</span>
+      </div>
+    </div>
+    <div style="text-align:right">
+      <div id="clock">--:--:--</div>
+      <div id="dateline"></div>
+    </div>
+  </div>
+</header>
+<div id="prog-wrap"><div id="prog-bar"></div></div>
+<nav id="nav-tabs"></nav>
+
+<main>
+  <div class="section active" id="sec-overview">
+    <div class="overview-grid" id="ov-stats"></div>
+    <div class="grid2">
+      <div><div class="sec-hdr"><div class="sec-title">Robot fleet</div></div><div id="ov-robots"></div></div>
+      <div><div class="sec-hdr"><div class="sec-title">Announcements</div></div><div id="ov-ann"></div></div>
+    </div>
+  </div>
+
+  <div class="section" id="sec-pi">
+    <div class="sec-hdr"><div class="sec-title">Principal investigator</div></div>
+    <div id="pi-content"></div>
+  </div>
+
+  <div class="section" id="sec-students">
+    <div class="sec-hdr"><div class="sec-title">Lab members</div><div class="sec-count" id="student-count"></div></div>
+    <div class="gauto" id="students-grid"></div>
+  </div>
+
+  <div class="section" id="sec-projects">
+    <div class="sec-hdr"><div class="sec-title">Active projects</div><div class="sec-count" style="font-size:11px;color:var(--txt3)">Click a project to view details</div></div>
+    <div class="grid3" id="projects-grid"></div>
+  </div>
+
+  <div class="section" id="sec-past">
+    <div class="sec-hdr"><div class="sec-title">Past projects</div><div class="sec-count" style="font-size:11px;color:var(--txt3)">Click a project to view details</div></div>
+    <div class="grid3" id="past-grid"></div>
+  </div>
+
+  <div class="section" id="sec-ideas">
+    <div class="sec-hdr"><div class="sec-title">New ideas &amp; proposals</div></div>
+    <div class="gauto" id="ideas-grid"></div>
+  </div>
+
+  <div class="section" id="sec-robots">
+    <div class="sec-hdr"><div class="sec-title">Robot fleet status</div></div>
+    <div class="stat-row" id="robot-stats"></div>
+    <div class="grid3" id="robots-grid"></div>
+  </div>
+
+  <div class="section" id="sec-computers">
+    <div class="sec-hdr"><div class="sec-title">Workstation &amp; computer status</div></div>
+    <div class="stat-row" id="computer-stats"></div>
+    <div style="display:flex;flex-direction:column;gap:7px" id="computers-list"></div>
+  </div>
+
+  <div class="section" id="sec-publications">
+    <div class="sec-hdr"><div class="sec-title">Publications &amp; portfolio</div></div>
+    <div class="grid2" id="pubs-grid"></div>
+  </div>
+
+  <div class="section" id="sec-events">
+    <div class="sec-hdr"><div class="sec-title">Events &amp; deadlines</div></div>
+    <div class="grid2"><div id="events-list"></div><div id="deadlines-list"></div></div>
+  </div>
+
+  <div class="section" id="sec-announce">
+    <div class="sec-hdr"><div class="sec-title">Lab announcements</div></div>
+    <div id="announce-list"></div>
+  </div>
+
+  <div class="section" id="sec-news">
+    <div class="sec-hdr"><div class="sec-title">News feed</div></div>
+    <div class="grid3" id="news-grid"></div>
+  </div>
+</main>
+
+<script>
+/* ═══════════════════════════════════════════
+   TAB CYCLING
+═══════════════════════════════════════════ */
+const TABS=[
+  {id:'overview',label:'Overview'},{id:'pi',label:'Professor'},
+  {id:'students',label:'Members'},{id:'projects',label:'Active projects'},
+  {id:'past',label:'Past projects'},{id:'ideas',label:'New ideas'},
+  {id:'robots',label:'Robots'},{id:'computers',label:'Computers'},
+  {id:'publications',label:'Publications'},{id:'events',label:'Events & deadlines'},
+  {id:'announce',label:'Announcements'},{id:'news',label:'News feed'},
+];
+let curTab=0,cycleOn=true,cycleId=null,progId=null,cycleMs=12000,progStart=null;
+
+function initNav(){
+  const nav=document.getElementById('nav-tabs');
+  TABS.forEach((t,i)=>{
+    const b=document.createElement('button');
+    b.className='tab'+(i===0?' active':'');
+    b.textContent=t.label; b.dataset.i=i;
+    b.onclick=()=>goTab(i,true);
+    nav.appendChild(b);
+  });
+}
+function goTab(i,manual=false){
+  curTab=i;
+  document.querySelectorAll('.tab').forEach((b,j)=>b.classList.toggle('active',j===i));
+  document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id==='sec-'+TABS[i].id));
+  document.getElementById('nav-tabs').children[i].scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+  if(manual&&cycleOn) restartCycle(); else if(cycleOn) startProg();
+}
+function nextTab(){goTab((curTab+1)%TABS.length,true)}
+function prevTab(){goTab((curTab-1+TABS.length)%TABS.length,true)}
+function startProg(){
+  const bar=document.getElementById('prog-bar');
+  bar.style.transition='none';bar.style.width='0%';
+  cancelAnimationFrame(progId); progStart=performance.now();
+  function tick(now){
+    bar.style.width=Math.min(100,(now-progStart)/cycleMs*100)+'%';
+    if((now-progStart)<cycleMs) progId=requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+function restartCycle(){
+  clearInterval(cycleId); startProg();
+  cycleId=setInterval(()=>goTab((curTab+1)%TABS.length),cycleMs);
+}
+function toggleCycle(){
+  cycleOn=!cycleOn;
+  const btn=document.getElementById('btn-play');
+  if(cycleOn){btn.textContent='⏸ Pause';btn.classList.add('on');restartCycle();}
+  else{btn.textContent='▶ Play';btn.classList.remove('on');clearInterval(cycleId);cancelAnimationFrame(progId);document.getElementById('prog-bar').style.width='0%';}
+}
+function setSpeed(v){cycleMs=v*1000;document.getElementById('speed-lbl').textContent=v+'s';if(cycleOn)restartCycle();}
+document.querySelector('main').addEventListener('mouseenter',()=>{if(cycleOn){clearInterval(cycleId);cancelAnimationFrame(progId);}});
+document.querySelector('main').addEventListener('mouseleave',()=>{if(cycleOn)restartCycle();});
+
+/* ═══════════════════════════════════════════
+   PROJECT DETAIL VIEWER
+═══════════════════════════════════════════ */
+let pvPages=[], pvCur=0, pvCycleOn=true, pvCycleId=null, pvProgId=null, pvMs=8000, pvProgStart=null;
+
+function openProjViewer(proj){
+  if(cycleOn){clearInterval(cycleId);cancelAnimationFrame(progId);}
+  pvPages = buildPages(proj);
+  pvCur=0;
+  renderPvPages();
+  document.getElementById('proj-viewer').classList.add('open');
+  pvGoPage(0);
+  if(pvCycleOn) pvRestartCycle();
+}
+
+function closeProjViewer(){
+  document.getElementById('proj-viewer').classList.remove('open');
+  clearInterval(pvCycleId); cancelAnimationFrame(pvProgId);
+  document.getElementById('pv-prog-bar').style.width='0%';
+  if(cycleOn) restartCycle();
+}
+
+function buildPages(proj){
+  const pages=[];
+  // PAGE 1: hero
+  pages.push({type:'hero', proj});
+  // remaining pages from proj.pages array
+  (proj.pages||[]).forEach(pg=>pages.push(pg));
+  return pages;
+}
+
+function renderPvPages(){
+  const stage=document.getElementById('pv-stage');
+  stage.innerHTML='';
+  pvPages.forEach((pg,i)=>{
+    const div=document.createElement('div');
+    div.className='pv-page'; div.id='pvp-'+i;
+    div.innerHTML=renderPage(pg);
+    stage.appendChild(div);
+  });
+  // dots
+  const dots=document.getElementById('pv-dots');
+  dots.innerHTML=pvPages.map((_,i)=>`<div class="pv-dot${i===0?' on':''}" onclick="pvGoPage(${i})"></div>`).join('');
+}
+
+function renderPage(pg){
+  switch(pg.type){
+    case 'hero':      return heroPage(pg.proj);
+    case 'photos':    return photosPage(pg);
+    case 'video':     return videoPage(pg);
+    case 'findings':  return findingsPage(pg);
+    case 'text':      return textPage(pg);
+    case 'mixed':     return mixedPage(pg);
+    default:          return `<div style="padding:40px;color:var(--txt2)">Unknown page type: ${pg.type}</div>`;
+  }
+}
+
+function heroPage(proj){
+  const memberChips=(proj.members||[]).map((m,i)=>{
+    const mem=MEMBERS_MAP[m]||{name:m};
+    const av=mem.photo
+      ?`<div class="pv-mini-av"><img src="${mem.photo}" onerror="this.parentElement.innerHTML='${initials(m)}'"></div>`
+      :`<div class="pv-mini-av ac${i%8}" style="width:24px;height:24px;font-size:9px">${initials(m)}</div>`;
+    return `<div class="pv-hero-member">${av}<span>${m}</span></div>`;
+  }).join('');
+
+  const img=proj.photo?`<img class="pv-hero-img" src="${proj.photo}" alt="${proj.title}" onerror="this.style.display='none'">` :'';
+
+  return `<div class="pv-hero">
+    <div class="pv-hero-label">${proj._kind||'Project'} · ${badge(proj.status)}</div>
+    <div class="pv-hero-title">${proj.title}</div>
+    ${img}
+    <div class="pv-hero-abstract">${proj.abstract||proj.description||''}</div>
+    <div class="pv-hero-meta">
+      <div style="font-size:11px;color:var(--txt3)">Team</div>
+      <div class="pv-hero-team">${memberChips}</div>
+    </div>
+  </div>`;
+}
+
+function photosPage(pg){
+  const items=pg.items||[];
+  const cols=Math.min(3,items.length);
+  const colCls=['','cols1','cols2','cols3'][cols]||'cols3';
+  const media=items.map(item=>{
+    if(item.video_file){
+      return `<div class="pv-photo-item">
+        <video controls src="${item.video_file}"></video>
+        ${item.caption?`<div class="pv-photo-cap">${item.caption}</div>`:''}
+      </div>`;
+    }
+    return `<div class="pv-photo-item">
+      <img src="${item.src}" alt="${item.caption||''}" onerror="this.style.display='none'">
+      ${item.caption?`<div class="pv-photo-cap">${item.caption}</div>`:''}
+    </div>`;
+  }).join('');
+  return `<div class="pv-photo-page">
+    <h2>${pg.title||'Photos'}</h2>
+    ${pg.description?`<p style="font-size:13px;color:var(--txt2)">${pg.description}</p>`:''}
+    <div class="pv-photo-grid ${colCls}">${media}</div>
+  </div>`;
+}
+
+function videoPage(pg){
+  let embed='';
+  if(pg.youtube){
+    const id=pg.youtube.match(/(?:v=|youtu\.be\/)([^&?]+)/)?.[1]||pg.youtube;
+    embed=`<div class="pv-video-wrap"><iframe src="https://www.youtube.com/embed/${id}" frameborder="0" allowfullscreen></iframe></div>`;
+  } else if(pg.vimeo){
+    embed=`<div class="pv-video-wrap"><iframe src="https://player.vimeo.com/video/${pg.vimeo}" frameborder="0" allowfullscreen></iframe></div>`;
+  } else if(pg.src){
+    embed=`<div class="pv-video-wrap"><video controls src="${pg.src}"></video></div>`;
+  }
+  return `<div class="pv-video-page">
+    <h2>${pg.title||'Video'}</h2>
+    ${pg.description?`<p style="font-size:13px;color:var(--txt2);margin-bottom:10px">${pg.description}</p>`:''}
+    ${embed}
+  </div>`;
+}
+
+function findingsPage(pg){
+  const icons={finding:'🔍',inference:'💡',result:'✅',warning:'⚠️'};
+  const cards=(pg.items||[]).map(item=>`
+    <div class="pv-finding-card fi-${item.type||'finding'}">
+      <div class="pv-finding-icon">${icons[item.type||'finding']||'🔎'}</div>
+      <div>
+        <div class="pv-finding-title">${item.title}</div>
+        <div class="pv-finding-body">${item.body}</div>
+      </div>
+    </div>`).join('');
+  return `<div class="pv-findings-page">
+    <h2>${pg.title||'Findings &amp; Inferences'}</h2>
+    ${pg.description?`<p style="font-size:13px;color:var(--txt2);margin-bottom:4px">${pg.description}</p>`:''}
+    ${cards}
+  </div>`;
+}
+
+function textPage(pg){
+  const paras=(pg.paragraphs||[pg.body||'']).map(p=>`<p class="pv-text-body">${p}</p>`).join('');
+  return `<div class="pv-text-page">
+    <h2>${pg.title||''}</h2>
+    ${paras}
+  </div>`;
+}
+
+function mixedPage(pg){
+  const left=pg.left||{};
+  const right=pg.right||{};
+  const renderBlock=b=>{
+    if(b.type==='photo') return `<img src="${b.src}" alt="${b.caption||''}" style="width:100%;border-radius:var(--r);border:0.5px solid var(--border);object-fit:cover;max-height:320px">`;
+    if(b.type==='text') return `<div style="font-size:14px;color:var(--txt2);line-height:1.75">${(b.paragraphs||[b.body||'']).join('<br><br>')}</div>`;
+    if(b.type==='findings') return findingsPage(b).replace('<div class="pv-findings-page">','<div>').replace('</div>','');
+    return '';
+  };
+  return `<div class="pv-mixed-page">
+    <h2>${pg.title||''}</h2>
+    <div class="pv-mixed-grid">
+      <div>${renderBlock(left)}</div>
+      <div>${renderBlock(right)}</div>
+    </div>
+  </div>`;
+}
+
+function pvGoPage(i){
+  pvCur=i;
+  document.querySelectorAll('.pv-page').forEach((p,j)=>p.classList.toggle('on',j===i));
+  document.querySelectorAll('.pv-dot').forEach((d,j)=>d.classList.toggle('on',j===i));
+  document.getElementById('pv-page-info').textContent=`Page ${i+1} of ${pvPages.length}`;
+  document.getElementById('pv-prev').disabled=i===0;
+  document.getElementById('pv-next').disabled=i===pvPages.length-1;
+  if(pvCycleOn) pvRestartCycle();
+  // scroll stage to top
+  document.querySelectorAll('.pv-page').forEach(p=>{ p.scrollTop=0; });
+}
+
+function pvNav(dir){
+  const next=pvCur+dir;
+  if(next>=0&&next<pvPages.length) pvGoPage(next);
+}
+
+function pvStartProg(){
+  const bar=document.getElementById('pv-prog-bar');
+  bar.style.transition='none';bar.style.width='0%';
+  cancelAnimationFrame(pvProgId); pvProgStart=performance.now();
+  function tick(now){
+    bar.style.width=Math.min(100,(now-pvProgStart)/pvMs*100)+'%';
+    if((now-pvProgStart)<pvMs) pvProgId=requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+function pvRestartCycle(){
+  clearInterval(pvCycleId); pvStartProg();
+  pvCycleId=setInterval(()=>{
+    if(pvCur<pvPages.length-1) pvGoPage(pvCur+1);
+    else{ clearInterval(pvCycleId); cancelAnimationFrame(pvProgId); document.getElementById('pv-prog-bar').style.width='100%'; }
+  },pvMs);
+}
+function pvToggleCycle(){
+  pvCycleOn=!pvCycleOn;
+  const btn=document.getElementById('pv-play-btn');
+  if(pvCycleOn){btn.textContent='⏸ Pause';btn.classList.add('on');pvRestartCycle();}
+  else{btn.textContent='▶ Play';btn.classList.remove('on');clearInterval(pvCycleId);cancelAnimationFrame(pvProgId);document.getElementById('pv-prog-bar').style.width='0%';}
+}
+function pvSetSpeed(v){pvMs=v*1000;document.getElementById('pv-speed-lbl').textContent=v+'s';if(pvCycleOn)pvRestartCycle();}
+document.getElementById('pv-stage').addEventListener('mouseenter',()=>{if(pvCycleOn){clearInterval(pvCycleId);cancelAnimationFrame(pvProgId);}});
+document.getElementById('pv-stage').addEventListener('mouseleave',()=>{if(pvCycleOn&&document.getElementById('proj-viewer').classList.contains('open'))pvRestartCycle();});
+
+/* ═══════════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════════ */
+let MEMBERS_MAP={};
+function initials(n){return n.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();}
+function avHTML(p,idx,size=48){
+  const cls='ac'+(idx%8);
+  if(p&&p.photo) return `<div class="avatar" style="width:${size}px;height:${size}px"><img src="${p.photo}" alt="${p.name}" onerror="this.parentElement.innerHTML='<span>${initials(p.name)}</span>'" loading="lazy"></div>`;
+  return `<div class="avatar ${cls}" style="width:${size}px;height:${size}px;font-size:${Math.round(size*.33)}px">${p?initials(p.name):''}</div>`;
+}
+function badge(s){
+  const m={online:'ok',available:'ok',operational:'ok',active:'ok',done:'ok',warning:'warn',busy:'warn',charging:'warn',maintenance:'warn',offline:'err',error:'err',broken:'err',idle:'off',off:'off',inactive:'off'};
+  const cls=m[s]||'off';
+  return `<span class="badge ${cls}"><span class="bdot"></span>${s}</span>`;
+}
+function bar(p){const c=p>80?'r':p>50?'a':'g';return `<div class="bar-bg"><div class="bar-fill ${c}" style="width:${p}%"></div></div>`;}
+
+/* ═══════════════════════════════════════════
+   RENDER SECTIONS
+═══════════════════════════════════════════ */
+function render(data){
+  document.getElementById('lab-name').textContent=data.lab.name;
+  document.getElementById('lab-sub').textContent=data.lab.department;
+  MEMBERS_MAP={};
+  data.members.forEach(m=>{ MEMBERS_MAP[m.name]=m; });
+  renderOverview(data);
+  renderPI(data.pi);
+  renderStudents(data.members);
+  renderProjectGrid(data.projects,'projects-grid','active');
+  renderProjectGrid(data.past_projects,'past-grid','past');
+  renderIdeas(data.ideas);
+  renderRobots(data.robots);
+  renderComputers(data.computers);
+  renderPublications(data.publications);
+  renderEvents(data.events,data.deadlines);
+  renderAnnouncements(data.announcements);
+  renderNews(data.news);
+}
+
+function renderOverview(d){
+  document.getElementById('ov-stats').innerHTML=[
+    {l:'Members',v:d.members.length,c:'var(--blue)'},
+    {l:'Active projects',v:d.projects.length,c:'var(--teal)'},
+    {l:'Robots operational',v:d.robots.filter(r=>r.status==='operational').length+'/'+d.robots.length,c:'var(--green)'},
+    {l:'Workstations online',v:d.computers.filter(c=>c.status==='online').length+'/'+d.computers.length,c:'var(--purple)'},
+  ].map(s=>`<div class="ov-stat"><div class="ov-num" style="color:${s.c}">${s.v}</div><div class="ov-lbl">${s.l}</div></div>`).join('');
+  document.getElementById('ov-robots').innerHTML=d.robots.slice(0,5).map(r=>`<div class="device-card" style="margin-bottom:6px"><div><div class="dname">${r.name}</div><div class="dspec">${r.type}</div></div>${badge(r.status)}</div>`).join('');
+  document.getElementById('ov-ann').innerHTML=d.announcements.slice(0,3).map(a=>`<div class="announce-card"><div class="ann-title">${a.title}</div><div class="ann-body">${a.body}</div><div class="ann-date">${a.date}</div></div>`).join('');
+}
+
+function renderPI(pi){
+  document.getElementById('pi-content').innerHTML=`
+    <div class="pi-card">
+      <div class="pi-photo">${pi.photo?`<img src="${pi.photo}" alt="${pi.name}" onerror="this.parentElement.innerHTML='${initials(pi.name)}'">`:initials(pi.name)}</div>
+      <div style="flex:1">
+        <div class="pi-name">${pi.name}</div>
+        <div class="pi-title">${pi.title} · ${pi.department}</div>
+        <div class="pi-bio">${pi.bio}</div>
+        <div style="font-size:12px;color:var(--txt2);margin-bottom:9px"><span style="color:var(--txt);font-weight:500">Research interests:</span> ${pi.interests.join(' · ')}</div>
+        <div class="pi-links">
+          ${pi.email?`<span class="pi-link">✉ ${pi.email}</span>`:''}
+          ${pi.office?`<span class="pi-link">📍 ${pi.office}</span>`:''}
+          ${pi.website?`<a class="pi-link" href="${pi.website}" target="_blank">🌐 Website</a>`:''}
+          ${pi.scholar?`<a class="pi-link" href="${pi.scholar}" target="_blank">📄 Scholar</a>`:''}
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderStudents(members){
+  document.getElementById('student-count').textContent=members.length+' members';
+  const groups={};
+  members.forEach(m=>{ (groups[m.role]=groups[m.role]||[]).push(m); });
+  let html='';
+  let idx=0;
+  Object.entries(groups).forEach(([role,list])=>{
+    html+=`<div style="grid-column:1/-1;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.9px;color:var(--txt3);padding:4px 0 5px">${role}</div>`;
+    list.forEach(m=>{
+      html+=`<div class="person-card">
+        <div class="ph">${avHTML(m,idx)}<div><div class="pname">${m.name}</div><div class="prole">${m.year||''}</div></div></div>
+        <div class="ptags">${(m.interests||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+        ${m.email?`<div style="font-size:11px;color:var(--txt3)">${m.email}</div>`:''}
+      </div>`;
+      idx++;
+    });
+  });
+  document.getElementById('students-grid').innerHTML=html;
+}
+
+function renderProjectGrid(projects,targetId,kind){
+  document.getElementById(targetId).innerHTML=projects.map((p,i)=>{
+    const thumb=p.photo?`<img class="proj-thumb" src="${p.photo}" alt="${p.title}" onerror="this.style.display='none'">`
+      :`<div class="proj-thumb-ph">${kind==='past'?'📦':'🤖'}</div>`;
+    return `<div class="proj-card ${kind==='past'?'past':''}" onclick="openProjViewer(${JSON.stringify({...p,_kind:kind==='past'?'Past project':'Active project'}).replace(/"/g,'&quot;')})">
+      <div class="proj-accent"></div>
+      ${thumb}
+      <div class="proj-body">
+        <div class="proj-title">${p.title}</div>
+        <div class="proj-desc">${p.description}</div>
+        <div class="proj-foot"><div class="proj-members">${(p.members||[]).join(', ')}</div>${badge(p.status)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderIdeas(ideas){
+  document.getElementById('ideas-grid').innerHTML=ideas.map((p,i)=>`
+    <div class="proj-card idea" onclick="openProjViewer(${JSON.stringify({...p,_kind:'Idea',status:p.status||'idea'}).replace(/"/g,'&quot;')})">
+      <div class="proj-accent"></div>
+      ${p.photo?`<img class="proj-thumb" src="${p.photo}" alt="${p.title}" onerror="this.style.display='none'">`:
+        `<div class="proj-thumb-ph">💡</div>`}
+      <div class="proj-body">
+        <div class="proj-title">${p.title}</div>
+        <div class="proj-desc">${p.description}</div>
+        <div class="proj-foot"><div class="proj-members">By: ${p.proposed_by}</div><span class="badge info"><span class="bdot"></span>idea</span></div>
+      </div>
+    </div>`).join('');
+}
+
+function renderRobots(robots){
+  const op=robots.filter(r=>r.status==='operational').length;
+  document.getElementById('robot-stats').innerHTML=`
+    <div class="stat"><div class="stat-lbl">Total</div><div class="stat-val" style="color:var(--blue)">${robots.length}</div></div>
+    <div class="stat"><div class="stat-lbl">Operational</div><div class="stat-val" style="color:var(--green)">${op}</div></div>
+    <div class="stat"><div class="stat-lbl">Maintenance</div><div class="stat-val" style="color:var(--amber)">${robots.filter(r=>r.status==='maintenance').length}</div></div>
+    <div class="stat"><div class="stat-lbl">Offline</div><div class="stat-val" style="color:var(--red)">${robots.filter(r=>r.status==='offline').length}</div></div>`;
+  document.getElementById('robots-grid').innerHTML=robots.map(r=>`
+    <div class="robot-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px">
+        <div><div class="rname">${r.name}</div><div class="rtype">${r.type}</div></div>${badge(r.status)}
+      </div>
+      ${r.battery!=null?`<div class="rlbl"><span>Battery</span><span>${r.battery}%</span></div>${bar(r.battery)}`:''}
+      ${r.assigned_to?`<div class="rlbl" style="margin-top:5px"><span>Assigned</span><span>${r.assigned_to}</span></div>`:''}
+      ${r.location?`<div class="rlbl"><span>Location</span><span>${r.location}</span></div>`:''}
+      ${r.notes?`<div style="font-size:11px;color:var(--txt3);margin-top:4px">${r.notes}</div>`:''}
+    </div>`).join('');
+}
+
+function renderComputers(computers){
+  const on=computers.filter(c=>c.status==='online').length;
+  document.getElementById('computer-stats').innerHTML=`
+    <div class="stat"><div class="stat-lbl">Total</div><div class="stat-val" style="color:var(--blue)">${computers.length}</div></div>
+    <div class="stat"><div class="stat-lbl">Online</div><div class="stat-val" style="color:var(--green)">${on}</div></div>
+    <div class="stat"><div class="stat-lbl">Offline</div><div class="stat-val" style="color:var(--red)">${computers.filter(c=>c.status==='offline').length}</div></div>
+    <div class="stat"><div class="stat-lbl">In use</div><div class="stat-val" style="color:var(--amber)">${computers.filter(c=>c.user).length}</div></div>`;
+  document.getElementById('computers-list').innerHTML=computers.map(c=>`
+    <div class="device-card">
+      <div><div class="dname">${c.name}</div><div class="dspec">${c.specs||''}</div></div>
+      <div style="text-align:right">${badge(c.status)}<div style="font-size:11px;color:var(--txt2);margin-top:3px">${c.user?'Used by '+c.user:'Available'}</div></div>
+    </div>`).join('');
+}
+
+function renderPublications(pubs){
+  document.getElementById('pubs-grid').innerHTML=pubs.map(p=>`
+    <div class="pub-card">
+      <div class="pub-title">${p.title}</div>
+      <div class="pub-authors">${p.authors.join(', ')}</div>
+      <div style="display:flex;justify-content:space-between"><div class="pub-venue">${p.venue}</div><span style="font-size:11px;color:var(--txt3)">${p.year}</span></div>
+      ${p.award?`<div style="margin-top:5px"><span class="badge warn"><span class="bdot"></span>${p.award}</span></div>`:''}
+    </div>`).join('');
+}
+
+function renderEvents(events,deadlines){
+  const ev=e=>{const d=new Date(e.date);return `<div class="event-row"><div class="event-date"><div class="emonth">${d.toLocaleDateString('en-US',{month:'short'})}</div><div class="eday">${d.getDate()}</div></div><div><div class="etitle">${e.title}</div><div class="edesc">${e.description||''}</div></div></div>`;};
+  document.getElementById('events-list').innerHTML=`<div class="card-title" style="margin-bottom:8px">Upcoming events</div>`+events.map(ev).join('');
+  document.getElementById('deadlines-list').innerHTML=`<div class="card-title" style="margin-bottom:8px">Deadlines</div>`+deadlines.map(d=>{
+    const dt=new Date(d.date);
+    return `<div class="event-row"><div class="event-date" style="border-color:var(--red)"><div class="emonth">${dt.toLocaleDateString('en-US',{month:'short'})}</div><div class="eday" style="color:var(--red)">${dt.getDate()}</div></div><div><div class="etitle">${d.title}</div><div class="edesc">${d.description||''}</div></div></div>`;
+  }).join('');
+}
+
+function renderAnnouncements(a){
+  document.getElementById('announce-list').innerHTML=a.map(x=>`<div class="announce-card"><div class="ann-title">${x.title}</div><div class="ann-body">${x.body}</div><div class="ann-date">${x.date}</div></div>`).join('');
+}
+function renderNews(news){
+  document.getElementById('news-grid').innerHTML=news.map(n=>`<div class="news-card"><div class="nsrc">${n.source}</div><div class="ntitle">${n.title}</div><div class="ntime">${n.date}</div></div>`).join('');
+}
+
+function clock(){
+  const n=new Date();
+  document.getElementById('clock').textContent=n.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+  document.getElementById('dateline').textContent=n.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+}
+
+async function loadData(){
+  try{ const r=await fetch('lab270-data.json?t='+Date.now()); render(await r.json()); }
+  catch(e){ render(DEMO); }
+}
+
+/* ── DEMO DATA ── */
+const DEMO={
+  lab:{name:"Lab 270 — Distributed Robotics Lab",department:"Department of Computer Science & Engineering"},
+  pi:{name:"Dr. Ana Martínez",title:"Associate Professor",department:"Dept. of CS & Engineering",photo:"",
+    bio:"Dr. Martínez leads the Distributed Robotics Lab, focusing on multi-agent coordination, swarm intelligence, and human-robot interaction in unstructured environments.",
+    interests:["Multi-robot systems","Swarm intelligence","ROS 2","Human-robot interaction"],
+    email:"a.martinez@university.edu",office:"ENG 270B",website:"https://example.com",scholar:"https://scholar.google.com"},
+  members:[
+    {name:"Carlos Reyes",  role:"PhD Student",  year:"3rd year",interests:["Swarm robotics","ROS 2"],    email:"c.reyes@university.edu",  photo:""},
+    {name:"Priya Nair",    role:"PhD Student",  year:"2nd year",interests:["SLAM","Localization"],       email:"p.nair@university.edu",   photo:""},
+    {name:"Lena Fischer",  role:"PhD Student",  year:"1st year",interests:["Deep RL","Manipulation"],    email:"l.fischer@university.edu",photo:""},
+    {name:"Kwame Asante",  role:"PhD Student",  year:"4th year",interests:["Multi-agent","Planning"],    email:"k.asante@university.edu", photo:""},
+    {name:"Sofia Lombardi",role:"MS Student",   year:"2nd year",interests:["Computer vision","YOLO"],    email:"s.lombardi@university.edu",photo:""},
+    {name:"Tai Nguyen",    role:"MS Student",   year:"1st year",interests:["Embedded","C++"],            email:"t.nguyen@university.edu", photo:""},
+    {name:"Raj Patel",     role:"Undergraduate",year:"Senior",  interests:["ROS","Python"],              email:"r.patel@university.edu",  photo:""},
+    {name:"Amara Osei",    role:"Undergraduate",year:"Junior",  interests:["Electronics","Fabrication"], email:"a.osei@university.edu",   photo:""},
+  ],
+  projects:[
+    {
+      title:"SwarmNav: Decentralized navigation for robot swarms",
+      description:"Distributed planning algorithms for 10+ robot teams in GPS-denied environments.",
+      abstract:"SwarmNav investigates how a fleet of ground robots can navigate complex, GPS-denied indoor environments using only local sensing and peer-to-peer communication. Each robot runs a lightweight consensus algorithm that allows the swarm to collectively explore, map, and reach goals without any central coordinator.",
+      members:["Carlos Reyes","Kwame Asante"],status:"active",photo:"",
+      pages:[
+        {type:"photos",title:"Field experiments",description:"TurtleBot 4 swarm runs in the engineering building atrium.",
+          items:[{src:"",caption:"5-robot formation in corridor"},{src:"",caption:"Obstacle avoidance test"},{src:"",caption:"Goal-reaching experiment"}]},
+        {type:"findings",title:"Key findings & inferences",items:[
+          {type:"finding",title:"Communication radius is the critical parameter",body:"Experiments show swarm cohesion breaks down when robot-to-robot range drops below 4m. Above this threshold, the consensus algorithm converges reliably within 3 message rounds."},
+          {type:"finding",title:"Heterogeneous speeds degrade coordination",body:"Mixing TurtleBot 3 (0.22 m/s) and TurtleBot 4 (0.31 m/s) units in the same swarm introduces phase lag that accumulates over time. Homogeneous fleets converge 40% faster."},
+          {type:"inference",title:"Distributed Voronoi partitioning is the right abstraction",body:"Assigning each robot a Voronoi cell based on its current position naturally balances workload and prevents redundant exploration. This held across all 24 experiment runs."},
+          {type:"result",title:"98% area coverage achieved in under 8 minutes",body:"The swarm consistently covered 98% of the test arena (400 m²) in under 8 minutes across 12 repeated trials — a 3× improvement over the random-walk baseline."},
+        ]},
+        {type:"text",title:"Next steps",paragraphs:[
+          "The next phase of SwarmNav will move from simulation-validated algorithms into larger real-world deployments. We plan to scale from 5 to 20 robots and introduce heterogeneous sensing modalities — combining RGB-D cameras with 2D LiDAR.",
+          "We are also exploring how swarm behaviour changes under adversarial conditions: communication jamming, robot failure mid-mission, and dynamic obstacles such as people walking through the workspace.",
+          "A collaboration with the university's civil engineering department will allow us to test SwarmNav in a realistic disaster-response scenario inside a decommissioned building scheduled for demolition."
+        ]}
+      ]
+    },
+    {
+      title:"TactileGrasp: Sim-to-real manipulation learning",
+      description:"Training dexterous manipulation policies in simulation and transferring to physical arms.",
+      abstract:"TactileGrasp investigates how reinforcement learning policies trained entirely in physics simulation can be transferred to a real Franka Emika robot arm. The core challenge is the sim-to-real gap: simulator dynamics, contact models, and sensor noise rarely match physical reality. We apply domain randomisation and learned residual dynamics to close this gap.",
+      members:["Lena Fischer","Dr. Martínez"],status:"active",photo:"",
+      pages:[
+        {type:"photos",title:"Setup & experiments",items:[
+          {src:"",caption:"Franka arm with custom fingertip sensors"},{src:"",caption:"Simulation environment in Isaac Gym"}]},
+        {type:"findings",title:"Findings",items:[
+          {type:"finding",title:"Domain randomisation alone is insufficient for rigid objects",body:"Randomising friction, mass, and visual appearance in simulation reduced the sim-to-real gap significantly for soft objects but had limited effect on rigid cylindrical objects. Additional sensor noise injection was required."},
+          {type:"inference",title:"Tactile feedback adds more value than visual feedback for grasping",body:"Policies trained with simulated tactile input outperformed vision-only policies by 22 percentage points on unseen object geometries, suggesting that contact information is the more informative signal for grasping tasks."},
+          {type:"result",title:"87% grasp success rate on held-out objects",body:"The final policy achieved an 87% success rate on 30 unseen objects spanning 5 shape categories, compared to 61% for the vision-only baseline."},
+        ]}
+      ]
+    },
+    {
+      title:"SLAM++ for dynamic environments",
+      description:"Extending SLAM to handle moving objects in indoor warehouse scenarios.",
+      abstract:"Standard SLAM algorithms assume a static world. SLAM++ extends classical occupancy-grid and pose-graph SLAM to explicitly model, track, and remove dynamic objects — people, forklifts, moving boxes — allowing the robot to maintain an accurate map of the persistent scene while correctly associating sensor observations.",
+      members:["Priya Nair"],status:"active",photo:"",
+      pages:[
+        {type:"findings",title:"Findings & inferences",items:[
+          {type:"finding",title:"Moving objects corrupt pose-graph if not filtered",body:"Without dynamic object segmentation, 15% of keyframes in a busy warehouse aisle contained moving-object observations. These keyframes introduced systematic drift of 0.4 m per 100 m of travel."},
+          {type:"inference",title:"Semantic segmentation is a sufficient pre-filter",body:"A lightweight MobileNet-SSD running at 15 fps was sufficient to flag and exclude 94% of dynamic object observations before they entered the pose-graph, eliminating the drift at negligible computational cost on the GPU server."},
+        ]}
+      ]
+    },
+    {
+      title:"HRI Dashboard: Real-time robot monitoring",
+      description:"Web-based monitoring for live robot fleet telemetry.",
+      abstract:"The HRI Dashboard is a browser-based tool for real-time monitoring of heterogeneous robot fleets. It aggregates telemetry from ROS 2 topics over WebSockets, renders live maps, battery levels, and mission status, and provides a REST API for external systems — including the university hospital's facility management platform.",
+      members:["Sofia Lombardi","Tai Nguyen"],status:"active",photo:"",
+      pages:[
+        {type:"text",title:"System architecture",paragraphs:[
+          "The dashboard consists of a ROS 2 bridge node (Python, rclpy) that subscribes to all active robot topics and re-publishes them over a WebSocket server. The frontend is a single-page app built with vanilla JS and SVG-based map rendering.",
+          "A REST API layer (FastAPI) exposes read-only endpoints for integration with third-party systems. The hospital facility management platform polls /fleet/status every 30 seconds to display robot locations on their floor plan."
+        ]}
+      ]
+    }
+  ],
+  past_projects:[
+    {title:"DroneFormation v1: Fixed-wing UAV coordination",description:"Coordinated flight of 4 fixed-wing UAVs in V-formation using distributed consensus.",abstract:"DroneFormation v1 demonstrated that a small fleet of fixed-wing UAVs could maintain stable V-formation flight using only onboard sensors and peer-to-peer RF communication — no ground-station coordination.",members:["Kwame Asante","Carlos Reyes"],status:"done",photo:"",
+      pages:[{type:"findings",title:"Outcomes",items:[{type:"result",title:"Stable formation maintained at 14 m/s",body:"The fleet maintained V-formation with less than 0.8 m mean positional error at cruising speed across all 8 outdoor flight tests."},{type:"inference",title:"Wind is the dominant disturbance",body:"95% of formation errors exceeding 1.5 m occurred during gusts above 6 m/s. Future work should focus on wind-aware trajectory prediction."}]}]},
+    {title:"ChairBot: Assistive mobility robot",description:"Autonomous wheelchair navigation for hospital corridors. Piloted at University Medical Center.",abstract:"ChairBot is an autonomous navigation system retrofitted onto a standard powered wheelchair, enabling hands-free navigation through mapped hospital corridors via voice commands.",members:["Priya Nair","Dr. Martínez"],status:"done",photo:"",
+      pages:[{type:"findings",title:"Pilot outcomes",items:[{type:"result",title:"97% successful navigation across 200 real trips",body:"Over a 3-week hospital pilot, ChairBot completed 194 of 200 requested trips without human intervention. The 6 failures were all caused by unexpected elevator outages."},{type:"inference",title:"Elevator reliability is the single point of failure",body:"Multi-floor navigation is entirely dependent on elevator availability. The system should implement floor-change queueing and fallback routing."}]}]},
+  ],
+  ideas:[
+    {title:"Underwater swarm for pipeline inspection",description:"Miniature AUV swarm using acoustic communication for autonomous pipeline inspection.",proposed_by:"Carlos Reyes",photo:"",status:"idea",
+      pages:[{type:"text",title:"Motivation & approach",paragraphs:["Subsea pipeline networks span thousands of kilometres and are currently inspected by expensive ROV missions. A swarm of small, cheap AUVs communicating acoustically could cover the same distance at a fraction of the cost.","The key technical challenge is acoustic SLAM — using time-of-flight sonar measurements between swarm members to jointly estimate positions without GPS."]}]},
+    {title:"LLM-guided robot task planning",description:"Large language models as high-level planners decomposing natural language into robot primitives.",proposed_by:"Lena Fischer",photo:"",status:"idea",pages:[]},
+    {title:"Soft robotic gripper with tactile sensing",description:"3D-printed soft grippers with embedded pressure sensors for safe human-robot interaction.",proposed_by:"Amara Osei",photo:"",status:"idea",pages:[]},
+  ],
+  robots:[
+    {name:"Alpha-1",type:"TurtleBot 4 — ground mobile",status:"operational",battery:82,assigned_to:"Carlos Reyes",location:"Lab 270A"},
+    {name:"Alpha-2",type:"TurtleBot 4 — ground mobile",status:"operational",battery:57,assigned_to:"Priya Nair",location:"Corridor B"},
+    {name:"Alpha-3",type:"TurtleBot 4 — ground mobile",status:"charging",battery:23,assigned_to:"Available",location:"Charging dock"},
+    {name:"Beta-1", type:"Franka Emika — robot arm",   status:"operational",battery:null,assigned_to:"Lena Fischer",location:"Lab 270B"},
+    {name:"Beta-2", type:"Franka Emika — robot arm",   status:"maintenance",battery:null,assigned_to:"—",location:"Workshop",notes:"Wrist joint under repair"},
+    {name:"Gamma-1",type:"DJI M300 — UAV",             status:"offline",battery:0,assigned_to:"—",location:"Storage",notes:"Awaiting firmware update"},
+  ],
+  computers:[
+    {name:"Workstation-1 (ws1)",specs:"AMD Threadripper 3970X · RTX 3090 · 128GB",status:"online",user:"Carlos Reyes"},
+    {name:"Workstation-2 (ws2)",specs:"Intel i9-12900K · RTX 3080 · 64GB",status:"online",user:null},
+    {name:"Workstation-3 (ws3)",specs:"AMD Ryzen 9 5900X · RTX 3070 · 64GB",status:"online",user:"Priya Nair"},
+    {name:"GPU Server (gpu-svr)",specs:"Dual Xeon · 4× A100 80GB · 512GB",status:"online",user:"Lena Fischer (training)"},
+    {name:"NAS / Storage",specs:"Synology DS1821+ · 80TB raw",status:"online",user:null},
+    {name:"Odroid XU4 (display)",specs:"ARM Exynos · 2GB — dashboard node",status:"online",user:null},
+    {name:"Laptop-Shared-1",specs:"Dell XPS 15 · i7 · 16GB",status:"offline",user:null},
+  ],
+  publications:[
+    {title:"Decentralized multi-robot navigation under communication constraints",authors:["K. Asante","C. Reyes","A. Martínez"],venue:"IEEE ICRA 2024",year:2024,award:"Best paper finalist"},
+    {title:"Sim-to-real transfer for contact-rich manipulation tasks",authors:["L. Fischer","A. Martínez"],venue:"RSS 2023",year:2023},
+    {title:"Dynamic SLAM with moving object tracking in warehouse environments",authors:["P. Nair","A. Martínez"],venue:"IROS 2023",year:2023},
+    {title:"Formation control for heterogeneous UAV swarms",authors:["K. Asante","C. Reyes","A. Martínez"],venue:"Autonomous Robots, Springer 2022",year:2022},
+  ],
+  events:[
+    {date:"2026-06-15",title:"Lab retreat & planning day",description:"Full-day off-campus strategy session"},
+    {date:"2026-06-20",title:"ROS 2 workshop (internal)",description:"Intro to ROS 2 Nav2 stack — Tai presenting"},
+    {date:"2026-07-04",title:"ICRA 2026 — Seattle",description:"Carlos & Kwame presenting"},
+    {date:"2026-07-18",title:"Prospective student visit day",description:"3 PhD applicants visiting"},
+  ],
+  deadlines:[
+    {date:"2026-06-14",title:"IROS 2026 paper submission",description:"Full paper — 8 pages IEEE format"},
+    {date:"2026-06-30",title:"NSF Progress report due",description:"Annual report for grant #1234567"},
+    {date:"2026-07-10",title:"RA funding renewal form",description:"Submit to dept. grad coordinator"},
+  ],
+  announcements:[
+    {title:"New GPU server is live!",body:"The A100 cluster (gpu-svr) is now available. Request time via the shared calendar. Priority goes to active paper deadlines.",date:"June 2, 2026"},
+    {title:"Lab cleanup day — June 12",body:"Morning reorganising cables, labeling equipment, and disposing of old parts. All hands required.",date:"May 30, 2026"},
+    {title:"Welcome Lena Fischer!",body:"Lena joins as a new PhD student from TU Munich, working on sim-to-real manipulation.",date:"May 28, 2026"},
+  ],
+  news:[
+    {source:"IEEE Spectrum",title:"Swarm robotics achieves new record in warehouse sorting tasks",date:"June 3, 2026"},
+    {source:"Nature Robotics",title:"Tactile sensing enables robots to handle fragile objects reliably",date:"June 1, 2026"},
+    {source:"MIT News",title:"New ROS 2 release brings real-time capabilities to mobile platforms",date:"May 29, 2026"},
+    {source:"arXiv",title:"Foundation models as zero-shot robot task planners: a survey",date:"May 28, 2026"},
+    {source:"TechCrunch",title:"Startup raises $40M for autonomous last-mile delivery robots",date:"May 27, 2026"},
+    {source:"Science",title:"Bio-inspired locomotion outperforms rigid robots on uneven terrain",date:"May 25, 2026"},
+  ]
+};
+
+initNav();
+clock(); setInterval(clock,1000);
+loadData(); setInterval(loadData,60000);
+restartCycle();
+</script>
+</body>
+</html>

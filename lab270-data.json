@@ -1,0 +1,422 @@
+{
+  "lab": {
+    "name": "Lab 270 \u2014 Distributed Robotics Lab",
+    "department": "Department of Computer Science & Engineering"
+  },
+  "pi": {
+    "name": "Dr. Ana Mart\u00ednez",
+    "title": "Associate Professor",
+    "department": "Dept. of Computer Science & Engineering",
+    "bio": "Dr. Mart\u00ednez leads the Distributed Robotics Lab, focusing on multi-agent coordination, swarm intelligence, and human-robot interaction in unstructured environments. She joined the faculty in 2018 after a postdoc at MIT CSAIL.",
+    "interests": [
+      "Multi-robot systems",
+      "Swarm intelligence",
+      "ROS 2",
+      "Human-robot interaction",
+      "Sim-to-real transfer"
+    ],
+    "email": "a.martinez@university.edu",
+    "office": "ENG 270B",
+    "website": "https://example.com",
+    "scholar": "https://scholar.google.com",
+    "photo": ""
+  },
+  "members": [
+    {
+      "name": "Carlos Reyes",
+      "role": "PhD Student",
+      "year": "3rd year",
+      "interests": [
+        "Swarm robotics",
+        "ROS 2"
+      ],
+      "email": "c.reyes@university.edu",
+      "photo": ""
+    },
+    {
+      "name": "Priya Nair",
+      "role": "PhD Student",
+      "year": "2nd year",
+      "interests": [
+        "SLAM",
+        "Localization"
+      ],
+      "email": "p.nair@university.edu",
+      "photo": ""
+    },
+    {
+      "name": "Lena Fischer",
+      "role": "PhD Student",
+      "year": "1st year",
+      "interests": [
+        "Deep RL",
+        "Manipulation"
+      ],
+      "email": "l.fischer@university.edu",
+      "photo": ""
+    },
+    {
+      "name": "Kwame Asante",
+      "role": "PhD Student",
+      "year": "4th year",
+      "interests": [
+        "Multi-agent",
+        "Planning"
+      ],
+      "email": "k.asante@university.edu",
+      "photo": ""
+    },
+    {
+      "name": "Sofia Lombardi",
+      "role": "MS Student",
+      "year": "2nd year",
+      "interests": [
+        "Computer vision",
+        "YOLO"
+      ],
+      "email": "s.lombardi@university.edu",
+      "photo": ""
+    },
+    {
+      "name": "Tai Nguyen",
+      "role": "MS Student",
+      "year": "1st year",
+      "interests": [
+        "Embedded",
+        "C++"
+      ],
+      "email": "t.nguyen@university.edu",
+      "photo": ""
+    },
+    {
+      "name": "Raj Patel",
+      "role": "Undergraduate",
+      "year": "Senior",
+      "interests": [
+        "ROS",
+        "Python"
+      ],
+      "email": "r.patel@university.edu",
+      "photo": ""
+    },
+    {
+      "name": "Amara Osei",
+      "role": "Undergraduate",
+      "year": "Junior",
+      "interests": [
+        "Electronics",
+        "Fabrication"
+      ],
+      "email": "a.osei@university.edu",
+      "photo": ""
+    }
+  ],
+  "projects": [
+    {
+      "title": "SwarmNav: Decentralized navigation for robot swarms",
+      "description": "Developing distributed planning algorithms for 10+ robot teams operating in GPS-denied environments using only local sensor data.",
+      "members": [
+        "Carlos Reyes",
+        "Kwame Asante"
+      ],
+      "status": "active",
+      "photo": ""
+    },
+    {
+      "title": "TactileGrasp: Sim-to-real manipulation learning",
+      "description": "Training dexterous manipulation policies in simulation and transferring to physical robot arms using domain randomization.",
+      "members": [
+        "Lena Fischer",
+        "Dr. Mart\u00ednez"
+      ],
+      "status": "active",
+      "photo": ""
+    },
+    {
+      "title": "SLAM++ for dynamic environments",
+      "description": "Extending SLAM algorithms to handle moving objects in indoor warehouse scenarios.",
+      "members": [
+        "Priya Nair"
+      ],
+      "status": "active",
+      "photo": ""
+    },
+    {
+      "title": "HRI Dashboard: Real-time robot monitoring UI",
+      "description": "Web-based monitoring for live robot fleet telemetry, in collaboration with the university hospital.",
+      "members": [
+        "Sofia Lombardi",
+        "Tai Nguyen"
+      ],
+      "status": "active",
+      "photo": ""
+    }
+  ],
+  "past_projects": [
+    {
+      "title": "DroneFormation v1: Fixed-wing UAV coordination",
+      "description": "Coordinated flight of 4 fixed-wing UAVs in V-formation using distributed consensus algorithms.",
+      "members": [
+        "Kwame Asante",
+        "Carlos Reyes"
+      ],
+      "status": "done",
+      "photo": ""
+    },
+    {
+      "title": "ChairBot: Assistive mobility robot",
+      "description": "Autonomous wheelchair navigation for hospital corridors. Deployed in pilot at University Medical Center.",
+      "members": [
+        "Priya Nair",
+        "Dr. Mart\u00ednez"
+      ],
+      "status": "done",
+      "photo": ""
+    }
+  ],
+  "ideas": [
+    {
+      "title": "Underwater swarm for pipeline inspection",
+      "description": "Miniature AUV swarm for inspecting underwater pipelines autonomously, using acoustic communication.",
+      "proposed_by": "Carlos Reyes",
+      "photo": ""
+    },
+    {
+      "title": "LLM-guided robot task planning",
+      "description": "Using large language models as high-level task planners that decompose natural language commands into robot primitives.",
+      "proposed_by": "Lena Fischer",
+      "photo": ""
+    },
+    {
+      "title": "Soft robotic gripper with tactile sensing",
+      "description": "3D-printed soft grippers embedded with pressure sensors for safe physical human-robot interaction.",
+      "proposed_by": "Amara Osei",
+      "photo": ""
+    }
+  ],
+  "robots": [
+    {
+      "name": "Alpha-1",
+      "type": "TurtleBot 4 \u2014 ground mobile",
+      "status": "operational",
+      "battery": 82,
+      "assigned_to": "Carlos Reyes",
+      "location": "Lab 270A"
+    },
+    {
+      "name": "Alpha-2",
+      "type": "TurtleBot 4 \u2014 ground mobile",
+      "status": "operational",
+      "battery": 57,
+      "assigned_to": "Priya Nair",
+      "location": "Corridor B"
+    },
+    {
+      "name": "Alpha-3",
+      "type": "TurtleBot 4 \u2014 ground mobile",
+      "status": "charging",
+      "battery": 23,
+      "assigned_to": "Available",
+      "location": "Charging dock"
+    },
+    {
+      "name": "Beta-1",
+      "type": "Franka Emika \u2014 robot arm",
+      "status": "operational",
+      "battery": null,
+      "assigned_to": "Lena Fischer",
+      "location": "Lab 270B"
+    },
+    {
+      "name": "Beta-2",
+      "type": "Franka Emika \u2014 robot arm",
+      "status": "maintenance",
+      "battery": null,
+      "assigned_to": "\u2014",
+      "location": "Workshop",
+      "notes": "Wrist joint under repair"
+    },
+    {
+      "name": "Gamma-1",
+      "type": "DJI M300 \u2014 UAV",
+      "status": "offline",
+      "battery": 0,
+      "assigned_to": "\u2014",
+      "location": "Storage",
+      "notes": "Awaiting firmware update"
+    }
+  ],
+  "computers": [
+    {
+      "name": "Workstation-1 (ws1)",
+      "specs": "AMD Threadripper 3970X \u00b7 RTX 3090 \u00b7 128GB RAM",
+      "status": "online",
+      "user": "Carlos Reyes"
+    },
+    {
+      "name": "Workstation-2 (ws2)",
+      "specs": "Intel i9-12900K \u00b7 RTX 3080 \u00b7 64GB RAM",
+      "status": "online",
+      "user": null
+    },
+    {
+      "name": "Workstation-3 (ws3)",
+      "specs": "AMD Ryzen 9 5900X \u00b7 RTX 3070 \u00b7 64GB RAM",
+      "status": "online",
+      "user": "Priya Nair"
+    },
+    {
+      "name": "GPU Server (gpu-svr)",
+      "specs": "Dual Xeon \u00b7 4\u00d7 A100 80GB \u00b7 512GB RAM",
+      "status": "online",
+      "user": "Lena Fischer (training job)"
+    },
+    {
+      "name": "NAS / Storage Server",
+      "specs": "Synology DS1821+ \u00b7 80TB raw",
+      "status": "online",
+      "user": null
+    },
+    {
+      "name": "Odroid XU4 (display)",
+      "specs": "ARM Exynos \u00b7 2GB RAM \u2014 dashboard node",
+      "status": "online",
+      "user": null
+    },
+    {
+      "name": "Laptop-Shared-1",
+      "specs": "Dell XPS 15 \u00b7 i7 \u00b7 16GB",
+      "status": "offline",
+      "user": null
+    }
+  ],
+  "publications": [
+    {
+      "title": "Decentralized multi-robot navigation under communication constraints",
+      "authors": [
+        "K. Asante",
+        "C. Reyes",
+        "A. Mart\u00ednez"
+      ],
+      "venue": "IEEE ICRA 2024",
+      "year": 2024,
+      "award": "Best paper finalist"
+    },
+    {
+      "title": "Sim-to-real transfer for contact-rich manipulation tasks",
+      "authors": [
+        "L. Fischer",
+        "A. Mart\u00ednez"
+      ],
+      "venue": "RSS 2023",
+      "year": 2023
+    },
+    {
+      "title": "Dynamic SLAM with moving object tracking in warehouse environments",
+      "authors": [
+        "P. Nair",
+        "A. Mart\u00ednez"
+      ],
+      "venue": "IROS 2023",
+      "year": 2023
+    },
+    {
+      "title": "Formation control for heterogeneous UAV swarms",
+      "authors": [
+        "K. Asante",
+        "C. Reyes",
+        "A. Mart\u00ednez"
+      ],
+      "venue": "Autonomous Robots, Springer 2022",
+      "year": 2022
+    }
+  ],
+  "events": [
+    {
+      "date": "2026-06-15",
+      "title": "Lab retreat & planning day",
+      "description": "Full-day off-campus strategy session"
+    },
+    {
+      "date": "2026-06-20",
+      "title": "ROS 2 workshop (internal)",
+      "description": "Intro to ROS 2 Nav2 stack \u2014 Tai presenting"
+    },
+    {
+      "date": "2026-07-04",
+      "title": "ICRA 2026 \u2014 Seattle",
+      "description": "Carlos & Kwame presenting"
+    },
+    {
+      "date": "2026-07-18",
+      "title": "Prospective student visit day",
+      "description": "3 PhD applicants visiting the lab"
+    }
+  ],
+  "deadlines": [
+    {
+      "date": "2026-06-14",
+      "title": "IROS 2026 paper submission",
+      "description": "Full paper \u2014 8 pages IEEE format"
+    },
+    {
+      "date": "2026-06-30",
+      "title": "NSF Progress report due",
+      "description": "Annual progress report for grant #1234567"
+    },
+    {
+      "date": "2026-07-10",
+      "title": "RA funding renewal form",
+      "description": "Submit to dept. grad coordinator"
+    }
+  ],
+  "announcements": [
+    {
+      "title": "New GPU server is live!",
+      "body": "The A100 cluster (gpu-svr) is now available. Request time via the shared calendar. Priority goes to active paper deadlines.",
+      "date": "June 2, 2026"
+    },
+    {
+      "title": "Lab cleanup day \u2014 June 12",
+      "body": "We'll spend the morning reorganising cables, labeling equipment, and disposing of old parts. All hands required.",
+      "date": "May 30, 2026"
+    },
+    {
+      "title": "Welcome Lena Fischer!",
+      "body": "Lena joins us as a new PhD student from TU Munich, working on sim-to-real manipulation. Please make her feel welcome.",
+      "date": "May 28, 2026"
+    }
+  ],
+  "news": [
+    {
+      "source": "IEEE Spectrum",
+      "title": "Swarm robotics achieves new record in warehouse sorting tasks",
+      "date": "June 3, 2026"
+    },
+    {
+      "source": "Nature Robotics",
+      "title": "Tactile sensing enables robots to handle fragile objects reliably",
+      "date": "June 1, 2026"
+    },
+    {
+      "source": "MIT News",
+      "title": "New ROS 2 release brings real-time capabilities to mobile platforms",
+      "date": "May 29, 2026"
+    },
+    {
+      "source": "arXiv",
+      "title": "Foundation models as zero-shot robot task planners: a survey",
+      "date": "May 28, 2026"
+    },
+    {
+      "source": "TechCrunch",
+      "title": "Startup raises $40M for autonomous last-mile delivery robots",
+      "date": "May 27, 2026"
+    },
+    {
+      "source": "Science",
+      "title": "Bio-inspired locomotion outperforms rigid robots on uneven terrain",
+      "date": "May 25, 2026"
+    }
+  ]
+}
