@@ -38,93 +38,52 @@
     "photo": ""
   },
   ],
-  "members": [
-    {
-      "name": "Carlos Reyes",
-      "role": "PhD Student",
-      "year": "3rd year",
-      "interests": [
-        "Swarm robotics",
-        "ROS 2"
-      ],
-      "email": "c.reyes@university.edu",
-      "photo": ""
-    },
-    {
-      "name": "Priya Nair",
-      "role": "PhD Student",
-      "year": "2nd year",
-      "interests": [
-        "SLAM",
-        "Localization"
-      ],
-      "email": "p.nair@university.edu",
-      "photo": ""
-    },
-    {
-      "name": "Lena Fischer",
-      "role": "PhD Student",
-      "year": "1st year",
-      "interests": [
-        "Deep RL",
-        "Manipulation"
-      ],
-      "email": "l.fischer@university.edu",
-      "photo": ""
-    },
-    {
-      "name": "Kwame Asante",
-      "role": "PhD Student",
-      "year": "4th year",
-      "interests": [
-        "Multi-agent",
-        "Planning"
-      ],
-      "email": "k.asante@university.edu",
-      "photo": ""
-    },
-    {
-      "name": "Sofia Lombardi",
+  "members": [{
+      "name": "Ammar Attaalla",
       "role": "MS Student",
       "year": "2nd year",
       "interests": [
         "Computer vision",
-        "YOLO"
+        "Cognitive Behvaiour Assessment"
       ],
-      "email": "s.lombardi@university.edu",
+      "email": "attaa002@umn.edu",
       "photo": ""
     },
     {
-      "name": "Tai Nguyen",
+      "name": "Aayush Anand",
       "role": "MS Student",
-      "year": "1st year",
+      "year": "2nd year",
       "interests": [
-        "Embedded",
-        "C++"
+        "Computer Vision",
+        "Autonomous Mobility"
       ],
-      "email": "t.nguyen@university.edu",
+      "email": "anand239@umn.edu",
       "photo": ""
     },
     {
-      "name": "Raj Patel",
-      "role": "Undergraduate",
-      "year": "Senior",
+      "name": "Mohammed Jassim Jahubar Ali",
+      "role": "MS Student",
+      "year": "1st Year",
       "interests": [
-        "ROS",
-        "Python"
+        "Computer Vision",
+        "AI and Machine Learning",
+        "Control Systems",
+        "Robotic Manipulation"
       ],
-      "email": "r.patel@university.edu",
+      "email": "jahub001@umn.edu",
       "photo": ""
     },
     {
-      "name": "Amara Osei",
-      "role": "Undergraduate",
-      "year": "Junior",
+      "name": "Tarun Mudaliar",
+      "role": "MS Student",
+      "year": "1st Year",
       "interests": [
-        "Electronics",
-        "Fabrication"
+        "computer Vision",
+        "Simulation",
+        "Robotics Manipualtion",
+        "Machine Learning"
       ],
-      "email": "a.osei@university.edu",
+      "email": "mudal010@umn.edu",
       "photo": ""
     }
   ],
