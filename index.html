@@ -1134,22 +1134,67 @@ function renderOverview(d){
 }
 
 function renderPI(pi){
-  document.getElementById('pi-content').innerHTML=`
+  const pis = Array.isArray(pi) ? pi : [pi];
+
+  document.getElementById('pi-content').innerHTML = pis.map(pi => `
     <div class="pi-card">
-      <div class="pi-photo">${pi.photo?`<img src="${pi.photo}" alt="${pi.name}" onerror="this.parentElement.innerHTML='${initials(pi.name)}'">`:initials(pi.name)}</div>
+      <div class="pi-photo">
+        ${pi.photo
+          ? `<img src="${pi.photo}" alt="${pi.name}" onerror="this.parentElement.innerHTML='${initials(pi.name)}'">`
+          : initials(pi.name)}
+      </div>
+
       <div style="flex:1">
         <div class="pi-name">${pi.name}</div>
         <div class="pi-title">${pi.title} · ${pi.department}</div>
         <div class="pi-bio">${pi.bio}</div>
-        <div style="font-size:12px;color:var(--txt2);margin-bottom:9px"><span style="color:var(--txt);font-weight:500">Research interests:</span> ${pi.interests.join(' · ')}</div>
+
+        <div style="font-size:12px;color:var(--txt2);margin-bottom:9px">
+          <span style="color:var(--txt);font-weight:500">Research interests:</span>
+          ${pi.interests.join(' · ')}
+        </div>
+
         <div class="pi-links">
-          ${pi.email?`<span class="pi-link">✉ ${pi.email}</span>`:''}
-          ${pi.office?`<span class="pi-link">📍 ${pi.office}</span>`:''}
-          ${pi.website?`<a class="pi-link" href="${pi.website}" target="_blank">🌐 Website</a>`:''}
-          ${pi.scholar?`<a class="pi-link" href="${pi.scholar}" target="_blank">📄 Scholar</a>`:''}
+          ${pi.email ? `<span class="pi-link">✉ ${pi.email}</span>` : ''}
+          ${pi.office ? `<span class="pi-link">📍 ${pi.office}</span>` : ''}
+          ${pi.website ? `<a class="pi-link" href="${pi.website}" target="_blank">🌐 Website</a>` : ''}
+          ${pi.scholar ? `<a class="pi-link" href="${pi.scholar}" target="_blank">📄 Scholar</a>` : ''}
         </div>
       </div>
-    </div>`;
+    </div>
+  `).join('');
+}
+  
+function renderPI(pi){
+  const pis = Array.isArray(pi) ? pi : [pi];
+
+  document.getElementById('pi-content').innerHTML = pis.map(pi => `
+    <div class="pi-card">
+      <div class="pi-photo">
+        ${pi.photo
+          ? `<img src="${pi.photo}" alt="${pi.name}" onerror="this.parentElement.innerHTML='${initials(pi.name)}'">`
+          : initials(pi.name)}
+      </div>
+
+      <div style="flex:1">
+        <div class="pi-name">${pi.name}</div>
+        <div class="pi-title">${pi.title} · ${pi.department}</div>
+        <div class="pi-bio">${pi.bio}</div>
+
+        <div style="font-size:12px;color:var(--txt2);margin-bottom:9px">
+          <span style="color:var(--txt);font-weight:500">Research interests:</span>
+          ${pi.interests.join(' · ')}
+        </div>
+
+        <div class="pi-links">
+          ${pi.email ? `<span class="pi-link">✉ ${pi.email}</span>` : ''}
+          ${pi.office ? `<span class="pi-link">📍 ${pi.office}</span>` : ''}
+          ${pi.website ? `<a class="pi-link" href="${pi.website}" target="_blank">🌐 Website</a>` : ''}
+          ${pi.scholar ? `<a class="pi-link" href="${pi.scholar}" target="_blank">📄 Scholar</a>` : ''}
+        </div>
+      </div>
+    </div>
+  `).join('');
 }
 
 function renderStudents(members){
