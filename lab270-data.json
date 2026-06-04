@@ -1,26 +1,43 @@
 {
   "lab": {
     "name": "Lab 270 \u2014 Distributed Robotics Lab",
-    "department": "Department of Computer Science & Engineering"
+    "department": "Minnesota Robotics Institute - MnRI"
   },
-  "pi": {
-    "name": "Dr. Ana Mart\u00ednez",
-    "title": "Associate Professor",
-    "department": "Dept. of Computer Science & Engineering",
-    "bio": "Dr. Mart\u00ednez leads the Distributed Robotics Lab, focusing on multi-agent coordination, swarm intelligence, and human-robot interaction in unstructured environments. She joined the faculty in 2018 after a postdoc at MIT CSAIL.",
+  "pi": [{
+    "name": "Professor Vassilios Morellas",
+    "title": "Research Professor",
+    "department": "Dept. of Electrical & Computer Engineering",
+    "bio": "Professor Vassilios Morellas's research interests are in the area of geometric image processing, machine learning, robotics, and sensor integration to enhance the automation of electromechanical systems. He is program director in the Department of Computer Science & Engineering and executive director of the NSF Center for Safety Security and Rescue. Prior to his current position, he was a senior principle research scientist at Honeywell Laboratories, where he developed technologies in the general areas of access control, security, and surveillance and biometrics with emphasis on the problem of tracking of people and vehicles across non-overlapping cameras. His past research experience also includes work on intelligent transformation systems, where he developed innovative technologies to reduce run-off-the-road accidents. Morellas obtained his diploma degree in mechanical engineering from the National Technical University of Athens, Greece, his MSME degree from Columbia University, and his PhD degree from the Department of Mechanical Engineering at the University of Minnesota. He publishes regularly in peer-reviewed conference proceedings and journals and has coauthored a book on camera programming.",
     "interests": [
-      "Multi-robot systems",
-      "Swarm intelligence",
-      "ROS 2",
-      "Human-robot interaction",
-      "Sim-to-real transfer"
+      "Geometric Image Processing",
+      "Machine Learning",
+      "Robotics",
+      "Sensor Fusion"
     ],
-    "email": "a.martinez@university.edu",
-    "office": "ENG 270B",
-    "website": "https://example.com",
+    "email": "morellas@umn.edu",
+    "office": "Shepherd Lab",
+    "website": "https://www.cts.umn.edu/programs-people/scholars/vassilios-morellas",
     "scholar": "https://scholar.google.com",
     "photo": ""
   },
+    {
+    "name": "Ted Morris",
+    "title": "Research Engineer",
+    "department": "Dept. of Computer Science Engineering",
+    "bio": "Ted Morris has worked across various application domains within Intelligent Transportation Systems, including self-driving/driver-assist heavy vehicles, mobile, and roadside computer vision sensing for evaluating and monitoring road user and traffic behaviors. As a MnRI research engineer, he co-leads and serves as the primary technical liaison for research projects for real-time, regionwide, truck parking monitoring and general- vulnerable road user behavior monitoring for applications to connected and autonomous vehicles. His research interests include VR immersive environments and sensing for human neurophysiologic and cognitive behavior assessment and collaborative robotic applications.",
+    "interests": [
+      "Computer Vision",
+      "Machine Learning",
+      "Mobile and Autonomous Robotics",
+      "Sensor Fusion"
+    ],
+    "email": "tmorris@umn.edu",
+    "office": "265 Shepherd Labs",
+    "website": "",
+    "scholar": "",
+    "photo": ""
+  },
+  ],
   "members": [
     {
       "name": "Carlos Reyes",
