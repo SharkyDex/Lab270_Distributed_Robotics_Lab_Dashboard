@@ -503,13 +503,16 @@ main{padding:28px 32px}
       <div><div class="sec-hdr"><div class="sec-title">Announcements</div></div><div id="ov-ann"></div></div>
     </div>
   </div>
-  <div class="section" id="sec-pi">
-    <div class="sec-hdr"><div class="sec-title">Principal investigator</div></div>
-    <div id="pi-content"></div>
-  </div>
-  <div class="section" id="sec-students">
-    <div class="sec-hdr"><div class="sec-title">Lab members</div><div class="sec-count" id="student-count"></div></div>
-    <div class="gauto" id="students-grid"></div>
+  <div class="section" id="sec-people">
+    <div class="sec-hdr">
+      <div class="sec-title">People</div>
+      <div style="display:flex;align-items:center;gap:14px">
+        <div class="sec-count" id="people-count"></div>
+        <div class="pv-page-info" id="people-page-info" style="min-width:90px">Person 1 of 1</div>
+        <div class="pv-dots" id="people-dots"></div>
+      </div>
+    </div>
+    <div class="pv-stage" style="position:relative;min-height:520px;border:1.5px solid var(--border);border-radius:14px;background:var(--bg2);box-shadow:var(--shadow)" id="people-stage"></div>
   </div>
   <div class="section" id="sec-projects">
     <div class="sec-hdr"><div class="sec-title">Active projects</div><div class="sec-count" style="font-size:0.55rem;color:var(--txt3)">Click a project to view details</div></div>
@@ -576,14 +579,15 @@ function toggleTheme(){
    TAB CYCLING
 ═══════════════════════════════════════════ */
 const TABS=[
-  {id:'overview',label:'Overview'},{id:'pi',label:'Professor'},
-  {id:'students',label:'Members'},{id:'projects',label:'Active projects'},
+  {id:'overview',label:'Overview'},{id:'people',label:'People'},
+  {id:'projects',label:'Active projects'},
   {id:'past',label:'Past projects'},{id:'ideas',label:'New ideas'},
   {id:'robots',label:'Robots'},{id:'computers',label:'Computers'},
   {id:'publications',label:'Publications'},{id:'events',label:'Events & deadlines'},
   {id:'announce',label:'Announcements'},{id:'news',label:'News feed'},
 ];
 let curTab=0,cycleOn=true,cycleId=null,progId=null,cycleMs=12000,progStart=null;
+let PEOPLE=[],peopleCur=0;
 
 function initNav(){
   const nav=document.getElementById('nav-tabs');
@@ -600,6 +604,7 @@ function goTab(i,manual=false){
   document.querySelectorAll('.tab').forEach((b,j)=>b.classList.toggle('active',j===i));
   document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id==='sec-'+TABS[i].id));
   document.getElementById('nav-tabs').children[i].scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+  if(TABS[i].id==='people') goPersonPage(0);
   if(manual&&cycleOn) restartCycle(); else if(cycleOn) startProg();
 }
 function nextTab(){goTab((curTab+1)%TABS.length,true)}
@@ -614,9 +619,17 @@ function startProg(){
   }
   requestAnimationFrame(tick);
 }
+function advanceCycle(){
+  if(TABS[curTab].id==='people' && PEOPLE.length>1 && peopleCur<PEOPLE.length-1){
+    goPersonPage(peopleCur+1);
+    startProg();
+    return;
+  }
+  goTab((curTab+1)%TABS.length);
+}
 function restartCycle(){
   clearInterval(cycleId); startProg();
-  cycleId=setInterval(()=>goTab((curTab+1)%TABS.length),cycleMs);
+  cycleId=setInterval(advanceCycle,cycleMs);
 }
 function toggleCycle(){
   cycleOn=!cycleOn;
@@ -649,6 +662,20 @@ function openProjViewer(proj){
   document.getElementById('proj-viewer').removeAttribute('data-edit-mode');
 }
 
+function openPersonViewer(person){
+  if(cycleOn){clearInterval(cycleId);cancelAnimationFrame(progId);}
+  pvCurrentProj=JSON.parse(JSON.stringify(person));
+  pvEditMode=false;
+  pvPages=[{type:'person_hero',person:pvCurrentProj}, ...(pvCurrentProj.pages||[])];
+  pvCur=0;
+  renderPvPages();
+  document.getElementById('proj-viewer').classList.add('open');
+  pvGoPage(0);
+  if(pvCycleOn) pvRestartCycle();
+  document.getElementById('pv-edit-bar').classList.remove('show');
+  document.getElementById('pv-edit-btn').classList.remove('on');
+  document.getElementById('proj-viewer').removeAttribute('data-edit-mode');
+}
 function closeProjViewer(){
   document.getElementById('proj-viewer').classList.remove('open');
   clearInterval(pvCycleId); cancelAnimationFrame(pvProgId);
@@ -697,6 +724,7 @@ function renderPvPages(){
 function renderPage(pg, pageIdx){
   switch(pg.type){
     case 'hero':       return heroPage(pg.proj,pageIdx);
+    case 'person_hero':return personHeroPage(pg.person,pageIdx);
     case 'photos':     return photosPage(pg,pageIdx);
     case 'video':      return videoPage(pg,pageIdx);
     case 'findings':   return findingsPage(pg,pageIdx);
@@ -719,9 +747,12 @@ function ef(val,pgIdx,field,tag='span',style=''){
 function pvFieldEdit(el){
   const pgIdx=parseInt(el.dataset.pg);
   const field=el.dataset.field;
-  if(pgIdx===0){
+  if(pgIdx===0 && pvPages[0].type==='hero'){
     pvCurrentProj[field]=el.textContent;
     pvPages[0].proj=pvCurrentProj;
+  } else if(pgIdx===0 && pvPages[0].type==='person_hero'){
+    pvCurrentProj[field]=el.textContent;
+    pvPages[0].person=pvCurrentProj;
   } else {
     const pg=pvPages[pgIdx];
     const parts=field.split('.');
@@ -748,6 +779,41 @@ function heroPage(proj,pgIdx){
     <div class="pv-hero-meta">
       <div style="font-size:0.55rem;color:var(--txt3)">Team</div>
       <div class="pv-hero-team">${memberChips}</div>
+    </div>
+  </div>`;
+}
+
+function personHeroPage(person,pgIdx){
+  const photoUrl=person.photo||'';
+  const img=photoUrl
+    ? `<img src="${photoUrl}" alt="${person.name}" style="width:200px;height:200px;border-radius:50%;object-fit:cover;border:1.5px solid var(--border);flex-shrink:0" onerror="this.outerHTML='<div style=&quot;width:200px;height:200px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:3rem;font-weight:700;flex-shrink:0&quot;>${initials(person.name)}</div>'">`
+    : `<div style="width:200px;height:200px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:3rem;font-weight:700;flex-shrink:0">${initials(person.name)}</div>`;
+  const interests=(person.interests||[]).map(t=>`<span class="tag">${t}</span>`).join(' ');
+  const kindLbl=person._kind==='pi'?'Faculty / Staff':'Lab member';
+  return `<div class="pv-hero">
+    <div class="pv-hero-label">${kindLbl}${person.year?' · '+person.year:''}</div>
+    <div style="display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap">
+      ${img}
+      <div style="flex:1;min-width:280px;display:flex;flex-direction:column;gap:8px">
+        <div class="pv-hero-title">${ef(person.name,pgIdx,'name','span','font-size:inherit;font-weight:inherit;letter-spacing:inherit;display:block')}</div>
+        <div style="font-size:0.65rem;color:var(--txt2)">
+          ${ef(person.role||person.title||'',pgIdx,'role')}${person.department?' · '+ef(person.department,pgIdx,'department'):''}
+        </div>
+        <div class="pv-hero-abstract">${ef(person.bio||person.description||'',pgIdx,'bio','span','font-size:inherit;line-height:inherit;display:block')}</div>
+        ${(person.interests&&person.interests.length)?`<div style="margin-top:6px"><div style="font-size:0.55rem;color:var(--txt3);margin-bottom:6px">Interests</div><div class="ptags">${interests}</div></div>`:''}
+        <div class="pi-links" style="margin-top:8px">
+          ${person.email?`<span class="pi-link">✉ ${ef(person.email,pgIdx,'email')}</span>`:''}
+          ${person.office?`<span class="pi-link">📍 ${ef(person.office,pgIdx,'office')}</span>`:''}
+          ${person.website?`<a class="pi-link" href="${person.website}" target="_blank">🌐 Website</a>`:''}
+          ${person.scholar?`<a class="pi-link" href="${person.scholar}" target="_blank">📄 Scholar</a>`:''}
+        </div>
+        <div style="margin-top:10px">
+          <div style="font-size:0.55rem;color:var(--txt3);margin-bottom:6px">Photo URL (edit, then click away to preview)</div>
+          <div class="editable-field" contenteditable="true" data-pg="${pgIdx}" data-field="photo"
+            oninput="pvFieldEdit(this)" onblur="renderPvPages();pvGoPage(${pgIdx})"
+            style="font-size:0.6rem;color:var(--txt2);display:block;word-break:break-all;min-height:1.4em">${photoUrl}</div>
+        </div>
+      </div>
     </div>
   </div>`;
 }
@@ -1071,10 +1137,9 @@ function render(data){
   document.getElementById('lab-name').textContent=data.lab.name;
   document.getElementById('lab-sub').textContent=data.lab.department;
   MEMBERS_MAP={};
-  data.members.forEach(m=>{MEMBERS_MAP[m.name]=m;});
+  (data.people||[]).forEach(m=>{MEMBERS_MAP[m.name]=m;});
   renderOverview(data);
-  renderPI(data.pi);
-  renderStudents(data.members);
+  renderPeople(data);
   renderProjectGrid(data.projects,'projects-grid','active');
   renderProjectGrid(data.past_projects,'past-grid','past');
   renderIdeas(data.ideas);
@@ -1088,7 +1153,7 @@ function render(data){
 
 function renderOverview(d){
   document.getElementById('ov-stats').innerHTML=[
-    {l:'Members',v:d.members.length,c:'var(--blue)'},
+    {l:'Members',v:(d.people||[]).filter(p=>p._kind==='member').length,c:'var(--blue)'},
     {l:'Active projects',v:d.projects.length,c:'var(--teal)'},
     {l:'Robots operational',v:d.robots.filter(r=>r.status==='operational').length+'/'+d.robots.length,c:'var(--green)'},
     {l:'Workstations online',v:d.computers.filter(c=>c.status==='online').length+'/'+d.computers.length,c:'var(--purple)'},
@@ -1097,45 +1162,58 @@ function renderOverview(d){
   document.getElementById('ov-ann').innerHTML=d.announcements.slice(0,3).map(a=>`<div class="announce-card"><div class="ann-title">${a.title}</div><div class="ann-body">${a.body}</div><div class="ann-date">${a.date}</div></div>`).join('');
 }
 
-function renderPI(pi){
-  const pis=Array.isArray(pi)?pi:[pi];
-  document.getElementById('pi-content').innerHTML=pis.map(pi=>`
-    <div class="pi-card">
-      <div class="pi-photo">${pi.photo?`<img src="${pi.photo}" alt="${pi.name}" onerror="this.parentElement.innerHTML='${initials(pi.name)}'">`:initials(pi.name)}</div>
-      <div style="flex:1">
-        <div class="pi-name">${pi.name}</div>
-        <div class="pi-title">${pi.title} · ${pi.department}</div>
-        <div class="pi-bio">${pi.bio}</div>
-        <div style="font-size:0.6rem;color:var(--txt2);margin-bottom:14px">
-          <span style="color:var(--txt);font-weight:500">Research interests:</span> ${pi.interests.join(' · ')}
-        </div>
-        <div class="pi-links">
-          ${pi.email?`<span class="pi-link">✉ ${pi.email}</span>`:''}
-          ${pi.office?`<span class="pi-link">📍 ${pi.office}</span>`:''}
-          ${pi.website?`<a class="pi-link" href="${pi.website}" target="_blank">🌐 Website</a>`:''}
-          ${pi.scholar?`<a class="pi-link" href="${pi.scholar}" target="_blank">📄 Scholar</a>`:''}
-        </div>
-      </div>
-    </div>`).join('');
+function renderPeople(data){
+  PEOPLE=data.people||[];
+  peopleCur=0;
+  const stage=document.getElementById('people-stage');
+  stage.innerHTML=PEOPLE.map((p,i)=>`<div class="pv-page people-pg${i===0?' on':''}" id="people-pg-${i}">${personPage(p)}</div>`).join('');
+  const dots=document.getElementById('people-dots');
+  dots.innerHTML=PEOPLE.map((_,i)=>`<div class="pv-dot${i===0?' on':''}" onclick="goPersonPage(${i})"></div>`).join('');
+  document.getElementById('people-count').textContent=PEOPLE.length+' people';
 }
 
-function renderStudents(members){
-  document.getElementById('student-count').textContent=members.length+' members';
-  const groups={};
-  members.forEach(m=>{(groups[m.role]=groups[m.role]||[]).push(m);});
-  let html=''; let idx=0;
-  Object.entries(groups).forEach(([role,list])=>{
-    html+=`<div style="grid-column:1/-1;font-size:0.5rem;font-weight:600;text-transform:uppercase;letter-spacing:.9px;color:var(--txt3);padding:6px 0 8px">${role}</div>`;
-    list.forEach(m=>{
-      html+=`<div class="person-card">
-        <div class="ph">${avHTML(m,idx)}<div><div class="pname">${m.name}</div><div class="prole">${m.year||''}</div></div></div>
-        <div class="ptags">${(m.interests||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
-        ${m.email?`<div style="font-size:0.55rem;color:var(--txt3)">${m.email}</div>`:''}
-      </div>`;
-      idx++;
-    });
-  });
-  document.getElementById('students-grid').innerHTML=html;
+function personPage(p){
+  const photoUrl=p.photo||'';
+  const img=photoUrl
+    ? `<img src="${photoUrl}" alt="${p.name}" style="width:200px;height:200px;border-radius:50%;object-fit:cover;border:1.5px solid var(--border);flex-shrink:0" onerror="this.outerHTML='<div style=&quot;width:200px;height:200px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:3rem;font-weight:700;flex-shrink:0&quot;>${initials(p.name)}</div>'">`
+    : `<div style="width:200px;height:200px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:3rem;font-weight:700;flex-shrink:0">${initials(p.name)}</div>`;
+  const kindLbl=p._kind==='pi'?'Faculty / Staff':'Lab member';
+  const interests=(p.interests&&p.interests.length)
+    ?`<div style="margin-top:6px"><div style="font-size:0.55rem;color:var(--txt3);margin-bottom:6px">Interests</div><div class="ptags">${p.interests.map(t=>`<span class="tag">${t}</span>`).join(' ')}</div></div>`
+    :'';
+  const projects=(p.projects&&p.projects.length)
+    ? p.projects.map(pr=>`<div class="device-card" style="margin-bottom:9px;align-items:flex-start"><div><div class="dname">${pr.title}</div><div class="dspec">${pr.description}</div></div>${badge(pr.status)}</div>`).join('')
+    : `<div style="font-size:0.6rem;color:var(--txt3)">No projects listed yet.</div>`;
+  return `<div class="pv-hero">
+    <div class="pv-hero-label">${kindLbl}${p.year?' · '+p.year:''}</div>
+    <div style="display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap">
+      ${img}
+      <div style="flex:1;min-width:280px;display:flex;flex-direction:column;gap:8px">
+        <div class="pv-hero-title">${p.name}</div>
+        <div style="font-size:0.65rem;color:var(--txt2)">${p.role||p.title||''}${p.department?' · '+p.department:''}</div>
+        ${(p.bio)?`<div class="pv-hero-abstract">${p.bio}</div>`:`<div style="font-size:0.6rem;color:var(--txt3)">No bio added yet.</div>`}
+        ${interests}
+        <div class="pi-links" style="margin-top:8px">
+          ${p.email?`<span class="pi-link">✉ ${p.email}</span>`:''}
+          ${p.office?`<span class="pi-link">📍 ${p.office}</span>`:''}
+          ${p.website?`<a class="pi-link" href="${p.website}" target="_blank">🌐 Website</a>`:''}
+          ${p.scholar?`<a class="pi-link" href="${p.scholar}" target="_blank">📄 Scholar</a>`:''}
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:18px">
+      <div class="card-title">Currently working on</div>
+      ${projects}
+    </div>
+  </div>`;
+}
+
+function goPersonPage(i){
+  if(!PEOPLE.length) return;
+  peopleCur=((i%PEOPLE.length)+PEOPLE.length)%PEOPLE.length;
+  document.querySelectorAll('.people-pg').forEach((el,j)=>el.classList.toggle('on',j===peopleCur));
+  document.querySelectorAll('#people-dots .pv-dot').forEach((el,j)=>el.classList.toggle('on',j===peopleCur));
+  document.getElementById('people-page-info').textContent='Person '+(peopleCur+1)+' of '+PEOPLE.length;
 }
 
 function renderProjectGrid(projects,targetId,kind){
@@ -1238,11 +1316,35 @@ function clock(){
 /* ═══════════════════════════════════════════
    AUTO-REFRESH every 2 minutes
 ═══════════════════════════════════════════ */
+/* Set this to your deployed Apps Script Web App URL to load people from
+   Google Drive. Leave empty ('') to use the local people/index.json folder. */
+const PEOPLE_SOURCE_URL = '';
+
+async function loadPeople(){
+  if(PEOPLE_SOURCE_URL){
+    const r=await fetch(PEOPLE_SOURCE_URL+'?t='+Date.now());
+    if(!r.ok) throw new Error('people source fetch failed');
+    const json=await r.json();
+    if(!Array.isArray(json)) throw new Error('people source did not return an array');
+    return json;
+  }
+  const idxR=await fetch('people/index.json?t='+Date.now());
+  if(!idxR.ok) throw new Error('people index fetch failed');
+  const idx=await idxR.json();
+  const files=idx.files||[];
+  const people=await Promise.all(files.map(async f=>{
+    const r=await fetch('people/'+f+'?t='+Date.now());
+    if(!r.ok) throw new Error('person fetch failed: '+f);
+    return r.json();
+  }));
+  return people;
+}
 async function loadData(){
   try{
     const r=await fetch('lab270-data.json?t='+Date.now());
     if(!r.ok) throw new Error('fetch failed');
     const data=await r.json();
+    try{ data.people=await loadPeople(); }catch(pe){ data.people=DEMO.people; }
     render(data);
     document.getElementById('refresh-status').textContent='Live · '+new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false});
   }catch(e){
@@ -1269,6 +1371,11 @@ const DEMO={
     {name:"Raj Patel",     role:"Undergraduate",year:"Senior",  interests:["ROS","Python"],              email:"r.patel@university.edu",  photo:""},
     {name:"Amara Osei",    role:"Undergraduate",year:"Junior",  interests:["Electronics","Fabrication"], email:"a.osei@university.edu",   photo:""},
   ],
+  get people(){
+    const pi={...this.pi,_kind:'pi',role:this.pi.title,projects:[]};
+    const members=this.members.map(m=>({...m,_kind:'member',bio:'',projects:[]}));
+    return [pi,...members];
+  },
   projects:[
     {title:"SwarmNav: Decentralized navigation for robot swarms",
      description:"Distributed planning algorithms for 10+ robot teams in GPS-denied environments.",
