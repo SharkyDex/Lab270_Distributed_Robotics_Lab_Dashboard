@@ -1353,6 +1353,10 @@ function clock(){
    Google Drive. Leave empty ('') to use the local people/index.json folder. */
 const PEOPLE_SOURCE_URL = 'https://script.google.com/macros/s/AKfycbwHHsZMcvbougPRikHLqeKyctLs3o75OKbw3jIgYnl2y4YGklUqDbz-ITn9TRdkwOnklw/exec';
 
+/* Apps Script Web App URL for projects. Must return { active:[...], past:[...] }.
+   Leave empty ('') to use the projects baked into lab270-data.json / demo data. */
+const PROJECTS_SOURCE_URL = '';
+
 async function loadPeople(){
   if(PEOPLE_SOURCE_URL){
     const r=await fetch(PEOPLE_SOURCE_URL+'?t='+Date.now());
@@ -1372,12 +1376,28 @@ async function loadPeople(){
   }));
   return people;
 }
+async function loadProjects(){
+  if(!PROJECTS_SOURCE_URL) throw new Error('no projects source configured');
+  const r=await fetch(PROJECTS_SOURCE_URL+'?t='+Date.now());
+  if(!r.ok) throw new Error('projects source fetch failed');
+  const json=await r.json();
+  if(!json||!Array.isArray(json.active)||!Array.isArray(json.past)) throw new Error('projects source did not return {active,past}');
+  return json;
+}
 async function loadData(){
   try{
     const r=await fetch('lab270-data.json?t='+Date.now());
     if(!r.ok) throw new Error('fetch failed');
     const data=await r.json();
     try{ data.people=await loadPeople(); }catch(pe){ data.people=DEMO.people; }
+    try{
+      const pj=await loadProjects();
+      data.projects=pj.active;
+      data.past_projects=pj.past;
+    }catch(pe){
+      if(!Array.isArray(data.projects)) data.projects=DEMO.projects;
+      if(!Array.isArray(data.past_projects)) data.past_projects=DEMO.past_projects;
+    }
     render(data);
     document.getElementById('refresh-status').textContent='Live · '+new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false});
   }catch(e){
