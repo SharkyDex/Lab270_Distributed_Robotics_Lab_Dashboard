@@ -530,11 +530,6 @@ main{padding:28px 32px}
     <div class="sec-hdr"><div class="sec-title">New ideas &amp; proposals</div></div>
     <div class="gauto" id="ideas-grid"></div>
   </div>
-  <div class="section" id="sec-robots">
-    <div class="sec-hdr"><div class="sec-title">Robot fleet status</div></div>
-    <div class="stat-row" id="robot-stats"></div>
-    <div class="grid3" id="robots-grid"></div>
-  </div>
   <div class="section" id="sec-computers">
     <div class="sec-hdr"><div class="sec-title">Workstation &amp; computer status</div></div>
     <div class="stat-row" id="computer-stats"></div>
@@ -586,7 +581,7 @@ const TABS=[
   {id:'overview',label:'Overview'},{id:'people',label:'People'},
   {id:'projects',label:'Active projects'},
   {id:'past',label:'Past projects'},{id:'ideas',label:'New ideas'},
-  {id:'robots',label:'Robots'},{id:'computers',label:'Computers'},
+  {id:'computers',label:'Computers'},
   {id:'publications',label:'Publications'},{id:'events',label:'Events & deadlines'},
   {id:'announce',label:'Announcements'},{id:'news',label:'News feed'},
 ];
@@ -1147,7 +1142,6 @@ function render(data){
   renderProjectGrid(data.projects,'projects-grid','active');
   renderProjectGrid(data.past_projects,'past-grid','past');
   renderIdeas(data.ideas);
-  renderRobots(data.robots);
   renderComputers(data.computers);
   renderPublications(data.publications);
   renderEvents(data.events,data.deadlines);
@@ -1280,25 +1274,6 @@ function renderIdeas(ideas){
     </div>`).join('');
 }
 
-function renderRobots(robots){
-  const op=robots.filter(r=>r.status==='operational').length;
-  document.getElementById('robot-stats').innerHTML=`
-    <div class="stat"><div class="stat-lbl">Total</div><div class="stat-val" style="color:var(--blue)">${robots.length}</div></div>
-    <div class="stat"><div class="stat-lbl">Operational</div><div class="stat-val" style="color:var(--green)">${op}</div></div>
-    <div class="stat"><div class="stat-lbl">Maintenance</div><div class="stat-val" style="color:var(--amber)">${robots.filter(r=>r.status==='maintenance').length}</div></div>
-    <div class="stat"><div class="stat-lbl">Offline</div><div class="stat-val" style="color:var(--red)">${robots.filter(r=>r.status==='offline').length}</div></div>`;
-  document.getElementById('robots-grid').innerHTML=robots.map(r=>`
-    <div class="robot-card">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
-        <div><div class="rname">${r.name}</div><div class="rtype">${r.type}</div></div>${badge(r.status)}
-      </div>
-      ${r.battery!=null?`<div class="rlbl"><span>Battery</span><span>${r.battery}%</span></div>${bar(r.battery)}`:''}
-      ${r.assigned_to?`<div class="rlbl" style="margin-top:8px"><span>Assigned</span><span>${r.assigned_to}</span></div>`:''}
-      ${r.location?`<div class="rlbl"><span>Location</span><span>${r.location}</span></div>`:''}
-      ${r.notes?`<div style="font-size:0.55rem;color:var(--txt3);margin-top:6px">${r.notes}</div>`:''}
-    </div>`).join('');
-}
-
 function renderComputers(computers){
   const on=computers.filter(c=>c.status==='online').length;
   document.getElementById('computer-stats').innerHTML=`
@@ -1351,11 +1326,15 @@ function clock(){
 ═══════════════════════════════════════════ */
 /* Set this to your deployed Apps Script Web App URL to load people from
    Google Drive. Leave empty ('') to use the local people/index.json folder. */
-const PEOPLE_SOURCE_URL = 'https://script.google.com/macros/s/AKfycbxUjxIkZtRLdO1TSHJva9FnBz-BQHR_HFFPD3Tqs_lzM77v5sLA25TgFLVgTR-glVJyMg/exec';
+const PEOPLE_SOURCE_URL = 'https://script.google.com/macros/s/AKfycbwHHsZMcvbougPRikHLqeKyctLs3o75OKbw3jIgYnl2y4YGklUqDbz-ITn9TRdkwOnklw/exec';
 
 /* Apps Script Web App URL for projects. Must return { active:[...], past:[...] }.
    Leave empty ('') to use the projects baked into lab270-data.json / demo data. */
-const PROJECTS_SOURCE_URL = 'https://script.google.com/macros/s/AKfycbzv1qd2QItoziotlvW6qo7UnyllbawhhGpMbtReaOC7AFxZ1FONIeMvi7dNXMHXbEON/exec';
+const PROJECTS_SOURCE_URL = '';
+
+/* Apps Script Web App URL for the news feed. Must return an array of
+   { source, title, date }. Leave empty ('') to use the demo news items. */
+const NEWS_SOURCE_URL = '';
 
 async function loadPeople(){
   if(PEOPLE_SOURCE_URL){
@@ -1384,6 +1363,14 @@ async function loadProjects(){
   if(!json||!Array.isArray(json.active)||!Array.isArray(json.past)) throw new Error('projects source did not return {active,past}');
   return json;
 }
+async function loadNews(){
+  if(!NEWS_SOURCE_URL) throw new Error('no news source configured');
+  const r=await fetch(NEWS_SOURCE_URL+'?t='+Date.now());
+  if(!r.ok) throw new Error('news source fetch failed');
+  const json=await r.json();
+  if(!Array.isArray(json)) throw new Error('news source did not return an array');
+  return json;
+}
 async function loadData(){
   try{
     const r=await fetch('lab270-data.json?t='+Date.now());
@@ -1398,6 +1385,7 @@ async function loadData(){
       if(!Array.isArray(data.projects)) data.projects=DEMO.projects;
       if(!Array.isArray(data.past_projects)) data.past_projects=DEMO.past_projects;
     }
+    try{ data.news=await loadNews(); }catch(pe){ if(!Array.isArray(data.news)) data.news=DEMO.news; }
     render(data);
     document.getElementById('refresh-status').textContent='Live · '+new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false});
   }catch(e){
