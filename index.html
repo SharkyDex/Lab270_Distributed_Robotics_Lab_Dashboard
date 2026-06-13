@@ -408,6 +408,10 @@ main{padding:28px 32px}
 .modal-btn.primary:hover{opacity:.9}
 .modal-btn.cancel{background:var(--bg3);color:var(--txt2);border:1.5px solid var(--border2)}
 .modal-btn.cancel:hover{background:var(--bg4)}
+
+/* ── PEOPLE TAB — big-screen fit, no scrolling ── */
+#people-stage .pv-page{ overflow:hidden; display:flex; padding:24px 48px; }
+#people-stage .pv-hero{ min-height:auto; margin:auto; transform-origin:center center; }
 </style>
 </head>
 <body>
@@ -604,7 +608,7 @@ function goTab(i,manual=false){
   document.querySelectorAll('.tab').forEach((b,j)=>b.classList.toggle('active',j===i));
   document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id==='sec-'+TABS[i].id));
   document.getElementById('nav-tabs').children[i].scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
-  if(TABS[i].id==='people') goPersonPage(0);
+  if(TABS[i].id==='people'){ sizePeopleStage(); goPersonPage(0); }
   if(manual&&cycleOn) restartCycle(); else if(cycleOn) startProg();
 }
 function nextTab(){goTab((curTab+1)%TABS.length,true)}
@@ -1170,6 +1174,9 @@ function renderPeople(data){
   const dots=document.getElementById('people-dots');
   dots.innerHTML=PEOPLE.map((_,i)=>`<div class="pv-dot${i===0?' on':''}" onclick="goPersonPage(${i})"></div>`).join('');
   document.getElementById('people-count').textContent=PEOPLE.length+' people';
+  if(document.getElementById('sec-people').classList.contains('active')){
+    requestAnimationFrame(()=>{ sizePeopleStage(); fitPeoplePage(); });
+  }
 }
 
 function personPage(p){
@@ -1214,7 +1221,33 @@ function goPersonPage(i){
   document.querySelectorAll('.people-pg').forEach((el,j)=>el.classList.toggle('on',j===peopleCur));
   document.querySelectorAll('#people-dots .pv-dot').forEach((el,j)=>el.classList.toggle('on',j===peopleCur));
   document.getElementById('people-page-info').textContent='Person '+(peopleCur+1)+' of '+PEOPLE.length;
+  requestAnimationFrame(fitPeoplePage);
 }
+
+/* ── PEOPLE TAB: fill the screen, scale each person to fit (no scrolling) ── */
+function sizePeopleStage(){
+  const stage=document.getElementById('people-stage');
+  if(!stage) return;
+  stage.style.minHeight='0';                               // override the inline 520px floor
+  const top=stage.getBoundingClientRect().top;             // accounts for header + nav + section title
+  stage.style.height=Math.max(360, window.innerHeight - top - 36)+'px';
+}
+
+function fitPeoplePage(){
+  const page=document.querySelector('.people-pg.on');
+  if(!page) return;
+  const hero=page.querySelector('.pv-hero');
+  if(!hero) return;
+  hero.style.transform='none';                             // reset before measuring
+  const avail=page.clientHeight - 48;                      // minus the 24px top/bottom padding
+  const needed=hero.offsetHeight;
+  const scale=needed>avail ? Math.max(0.45, avail/needed) : 1;
+  hero.style.transform = scale<1 ? `scale(${scale})` : 'none';
+}
+
+window.addEventListener('resize',()=>{
+  if(TABS[curTab].id==='people'){ sizePeopleStage(); requestAnimationFrame(fitPeoplePage); }
+});
 
 function renderProjectGrid(projects,targetId,kind){
   document.getElementById(targetId).innerHTML=projects.map((p,i)=>{
