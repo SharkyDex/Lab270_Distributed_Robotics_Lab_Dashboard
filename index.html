@@ -599,6 +599,7 @@ function initNav(){
   });
 }
 function goTab(i,manual=false){
+  if(i===0 && pendingData) applyData(pendingData);   // new loop starting — apply any queued data now
   curTab=i;
   document.querySelectorAll('.tab').forEach((b,j)=>b.classList.toggle('active',j===i));
   document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id==='sec-'+TABS[i].id));
@@ -1371,29 +1372,68 @@ async function loadNews(){
   if(!Array.isArray(json)) throw new Error('news source did not return an array');
   return json;
 }
-async function loadData(){
+/* ── Smart refresh ──
+   Poll the sources quietly in the background. Re-render ONLY when the data
+   actually changed, and (while the slideshow is running) defer that re-render
+   to the moment the rotation wraps back to the first tab — so the rebuild
+   never interrupts a slide. If the slideshow is paused, a change applies right
+   away, since there's no rotation boundary to wait for. */
+let lastDataSig=null, pendingData=null;
+
+function dataSignature(d){
   try{
-    const r=await fetch('lab270-data.json?t='+Date.now());
-    if(!r.ok) throw new Error('fetch failed');
-    const data=await r.json();
-    try{ data.people=await loadPeople(); }catch(pe){ data.people=DEMO.people; }
-    try{
-      const pj=await loadProjects();
-      data.projects=pj.active;
-      data.past_projects=pj.past;
-    }catch(pe){
-      if(!Array.isArray(data.projects)) data.projects=DEMO.projects;
-      if(!Array.isArray(data.past_projects)) data.past_projects=DEMO.past_projects;
-    }
-    try{ data.news=await loadNews(); }catch(pe){ if(!Array.isArray(data.news)) data.news=DEMO.news; }
-    render(data);
-    document.getElementById('refresh-status').textContent='Live · '+new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false});
+    return JSON.stringify({
+      lab:d.lab, people:d.people, projects:d.projects, past_projects:d.past_projects,
+      ideas:d.ideas, computers:d.computers, publications:d.publications,
+      events:d.events, deadlines:d.deadlines, announcements:d.announcements, news:d.news
+    });
+  }catch(e){ return String(Math.random()); }
+}
+
+function applyData(data){
+  render(data);
+  lastDataSig=dataSignature(data);
+  pendingData=null;
+  document.getElementById('refresh-status').textContent='Live · '+new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false});
+}
+
+async function fetchAll(){
+  const r=await fetch('lab270-data.json?t='+Date.now());
+  if(!r.ok) throw new Error('fetch failed');
+  const data=await r.json();
+  try{ data.people=await loadPeople(); }catch(pe){ data.people=DEMO.people; }
+  try{
+    const pj=await loadProjects();
+    data.projects=pj.active;
+    data.past_projects=pj.past;
+  }catch(pe){
+    if(!Array.isArray(data.projects)) data.projects=DEMO.projects;
+    if(!Array.isArray(data.past_projects)) data.past_projects=DEMO.past_projects;
+  }
+  try{ data.news=await loadNews(); }catch(pe){ if(!Array.isArray(data.news)) data.news=DEMO.news; }
+  return data;
+}
+
+async function loadData(initial){
+  try{
+    const data=await fetchAll();
+    if(initial || lastDataSig===null){ applyData(data); return; }   // first paint
+    if(dataSignature(data)===lastDataSig) return;                    // nothing changed — leave the screen alone
+    pendingData=data;                                                // changed — queue it
+    if(!cycleOn) applyData(data);                                    // paused: no boundary coming, apply now
+    else document.getElementById('refresh-status').textContent='Update queued · '+new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false});
   }catch(e){
-    render(DEMO);
-    document.getElementById('refresh-status').textContent='Offline (demo)';
+    if(initial || lastDataSig===null){
+      render(DEMO);
+      lastDataSig=dataSignature(DEMO);
+      document.getElementById('refresh-status').textContent='Offline (demo)';
+    }
+    /* background poll failed — keep showing current data */
   }
 }
-setInterval(loadData, 2*60*1000);
+
+/* check for new data every 2 minutes; the actual re-render is gated above */
+setInterval(()=>loadData(false), 2*60*1000);
 
 /* ══ DEMO DATA ══ */
 const DEMO={
@@ -1542,7 +1582,7 @@ const DEMO={
 
 initNav();
 clock(); setInterval(clock,1000);
-loadData();
+loadData(true);
 restartCycle();
 </script>
 </body>
