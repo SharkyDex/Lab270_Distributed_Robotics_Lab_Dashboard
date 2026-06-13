@@ -375,7 +375,7 @@ main{padding:28px 32px}
 .eday{font-size:1.3rem;font-weight:500;line-height:1.1}
 .etitle{font-size:0.65rem;font-weight:500;margin-bottom:3px}
 .edesc{font-size:0.6rem;color:var(--txt2)}
-.overview-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:22px}
+.overview-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:22px}
 .ov-stat{background:var(--bg2);border:1.5px solid var(--border);border-radius:12px;padding:18px;
   text-align:center;box-shadow:var(--shadow)}
 .ov-num{font-size:1.8rem;font-weight:600;letter-spacing:-1px}
@@ -502,10 +502,7 @@ main{padding:28px 32px}
 <main>
   <div class="section active" id="sec-overview">
     <div class="overview-grid" id="ov-stats"></div>
-    <div class="grid2">
-      <div><div class="sec-hdr"><div class="sec-title">Robot fleet</div></div><div id="ov-robots"></div></div>
-      <div><div class="sec-hdr"><div class="sec-title">Announcements</div></div><div id="ov-ann"></div></div>
-    </div>
+    <div><div class="sec-hdr"><div class="sec-title">Announcements</div></div><div id="ov-ann"></div></div>
   </div>
   <div class="section" id="sec-people">
     <div class="sec-hdr">
@@ -599,7 +596,10 @@ function initNav(){
   });
 }
 function goTab(i,manual=false){
-  if(i===0 && pendingData) applyData(pendingData);   // new loop starting — apply any queued data now
+  if(i===0){                                          // new loop starting — apply any queued update now
+    if(pendingData) applyData(pendingData);
+    else if(pendingNews) applyNews(pendingNews);
+  }
   curTab=i;
   document.querySelectorAll('.tab').forEach((b,j)=>b.classList.toggle('active',j===i));
   document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id==='sec-'+TABS[i].id));
@@ -1154,10 +1154,8 @@ function renderOverview(d){
   document.getElementById('ov-stats').innerHTML=[
     {l:'Members',v:(d.people||[]).filter(p=>p._kind==='member').length,c:'var(--blue)'},
     {l:'Active projects',v:d.projects.length,c:'var(--teal)'},
-    {l:'Robots operational',v:d.robots.filter(r=>r.status==='operational').length+'/'+d.robots.length,c:'var(--green)'},
     {l:'Workstations online',v:d.computers.filter(c=>c.status==='online').length+'/'+d.computers.length,c:'var(--purple)'},
   ].map(s=>`<div class="ov-stat"><div class="ov-num" style="color:${s.c}">${s.v}</div><div class="ov-lbl">${s.l}</div></div>`).join('');
-  document.getElementById('ov-robots').innerHTML=d.robots.slice(0,5).map(r=>`<div class="device-card" style="margin-bottom:9px"><div><div class="dname">${r.name}</div><div class="dspec">${r.type}</div></div>${badge(r.status)}</div>`).join('');
   document.getElementById('ov-ann').innerHTML=d.announcements.slice(0,3).map(a=>`<div class="announce-card"><div class="ann-title">${a.title}</div><div class="ann-body">${a.body}</div><div class="ann-date">${a.date}</div></div>`).join('');
 }
 
@@ -1373,28 +1371,42 @@ async function loadNews(){
   return json;
 }
 /* ── Smart refresh ──
-   Poll the sources quietly in the background. Re-render ONLY when the data
-   actually changed, and (while the slideshow is running) defer that re-render
-   to the moment the rotation wraps back to the first tab — so the rebuild
-   never interrupts a slide. If the slideshow is paused, a change applies right
-   away, since there's no rotation boundary to wait for. */
-let lastDataSig=null, pendingData=null;
+   Poll the sources quietly in the background. Re-render ONLY when data changed,
+   and (while cycling) defer the re-render to when the rotation wraps back to the
+   first tab — so it never interrupts a slide. The check is split: a "core" change
+   (people/projects/ideas/computers/etc.) does a full rebuild; a news-only change
+   just repaints the news grid, since the news feed churns on its own ~10-min cycle
+   and shouldn't trigger a whole-dashboard rebuild. Paused = apply immediately. */
+let lastCoreSig=null, lastNewsSig=null, pendingData=null, pendingNews=null;
 
-function dataSignature(d){
+function coreSignature(d){
   try{
     return JSON.stringify({
       lab:d.lab, people:d.people, projects:d.projects, past_projects:d.past_projects,
       ideas:d.ideas, computers:d.computers, publications:d.publications,
-      events:d.events, deadlines:d.deadlines, announcements:d.announcements, news:d.news
+      events:d.events, deadlines:d.deadlines, announcements:d.announcements
     });
   }catch(e){ return String(Math.random()); }
 }
+function newsSignature(d){
+  try{ return JSON.stringify(d.news||[]); }catch(e){ return String(Math.random()); }
+}
+function stamp(label){
+  document.getElementById('refresh-status').textContent=label+' · '+new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false});
+}
 
-function applyData(data){
+function applyData(data){            // full rebuild
   render(data);
-  lastDataSig=dataSignature(data);
-  pendingData=null;
-  document.getElementById('refresh-status').textContent='Live · '+new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false});
+  lastCoreSig=coreSignature(data);
+  lastNewsSig=newsSignature(data);
+  pendingData=null; pendingNews=null;
+  stamp('Live');
+}
+function applyNews(news){            // cheap news-only repaint
+  renderNews(news||[]);
+  lastNewsSig=JSON.stringify(news||[]);
+  pendingNews=null;
+  stamp('Live');
 }
 
 async function fetchAll(){
@@ -1417,15 +1429,21 @@ async function fetchAll(){
 async function loadData(initial){
   try{
     const data=await fetchAll();
-    if(initial || lastDataSig===null){ applyData(data); return; }   // first paint
-    if(dataSignature(data)===lastDataSig) return;                    // nothing changed — leave the screen alone
-    pendingData=data;                                                // changed — queue it
-    if(!cycleOn) applyData(data);                                    // paused: no boundary coming, apply now
-    else document.getElementById('refresh-status').textContent='Update queued · '+new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false});
+    if(initial || lastCoreSig===null){ applyData(data); return; }   // first paint
+    const cs=coreSignature(data), ns=newsSignature(data);
+    if(cs!==lastCoreSig){                                            // core changed -> full rebuild
+      pendingData=data;
+      if(!cycleOn) applyData(data); else stamp('Update queued');
+    } else if(ns!==lastNewsSig){                                     // only news changed -> cheap repaint
+      pendingNews=data.news;
+      if(!cycleOn) applyNews(data.news); else stamp('News queued');
+    }
+    /* else: nothing changed — leave the screen alone */
   }catch(e){
-    if(initial || lastDataSig===null){
+    if(initial || lastCoreSig===null){
       render(DEMO);
-      lastDataSig=dataSignature(DEMO);
+      lastCoreSig=coreSignature(DEMO);
+      lastNewsSig=newsSignature(DEMO);
       document.getElementById('refresh-status').textContent='Offline (demo)';
     }
     /* background poll failed — keep showing current data */
